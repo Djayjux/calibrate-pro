@@ -1,0 +1,1178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Calibrate Pro — Espresso Intelligence Platform</title>
+<meta name="description" content="Track espresso shots, manage bean inventory, and analyze team performance." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg: #0f1115;
+  --card: #1a1d23;
+  --card-hover: #22262e;
+  --border: #2a2e35;
+  --input-bg: #22262e;
+  --text: #f0ede8;
+  --text-muted: #8b9198;
+  --text-dim: #5a6068;
+  --primary: #c4a572;
+  --primary-hover: #d4b582;
+  --primary-dim: #c4a57222;
+  --success: #7fa66b;
+  --success-dim: #7fa66b22;
+  --warning: #d4a545;
+  --warning-dim: #d4a54522;
+  --danger: #c55a4a;
+  --danger-dim: #c55a4a22;
+  --info: #5b8fa8;
+  --info-dim: #5b8fa822;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
+  --shadow: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
+  --transition: all 0.2s ease;
+  --font-heading: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root { min-height: 100vh; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3e45; }
+
+::selection { background: var(--primary-dim); color: var(--text); }
+
+input, select, textarea, button { font-family: inherit; font-size: inherit; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.fade-in { animation: fadeIn 0.3s ease-out; }
+.slide-in { animation: slideIn 0.3s ease-out; }
+
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: var(--transition);
+  text-decoration: none;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: var(--primary); color: #14171a; }
+.btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: #3a3e45; background: var(--card-hover); }
+.btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger-dim); }
+.btn-danger:hover { background: var(--danger-dim); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: var(--transition);
+}
+.card:hover { border-color: #3a3e45; }
+.card-clickable { cursor: pointer; }
+.card-clickable:hover { background: var(--card-hover); }
+
+.input, .select, .textarea {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: var(--transition);
+}
+.input:focus, .select:focus, .textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-dim);
+}
+.textarea { resize: vertical; min-height: 80px; }
+
+.label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.badge-sage { color: var(--success); background: var(--success-dim); border: 1px solid var(--success); }
+.badge-rust { color: var(--danger); background: var(--danger-dim); border: 1px solid var(--danger); }
+.badge-amber { color: var(--warning); background: var(--warning-dim); border: 1px solid var(--warning); }
+.badge-steel { color: var(--info); background: var(--info-dim); border: 1px solid var(--info); }
+.badge-muted { color: var(--text-muted); background: transparent; border: 1px solid var(--border); }
+
+.grid { display: grid; gap: 16px; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 768px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .sidebar { display: none !important; }
+  .main-content { margin-left: 0 !important; padding: 16px !important; padding-bottom: 80px !important; }
+  .mobile-nav { display: flex !important; }
+}
+
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.toast {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  min-width: 280px;
+  max-width: 400px;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  animation: slideIn 0.3s ease-out;
+}
+
+.sidebar {
+  width: 240px;
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  background: var(--bg);
+  z-index: 100;
+}
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: var(--transition);
+  font-size: 14px;
+}
+.sidebar-nav-item:hover { background: var(--card-hover); color: var(--text); }
+.sidebar-nav-item.active { background: var(--primary-dim); color: var(--primary); }
+
+.main-content { margin-left: 240px; padding: 24px 32px; min-height: 100vh; }
+
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 8px;
+  z-index: 100;
+  justify-content: space-around;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+  color: #14171a;
+  flex-shrink: 0;
+}
+.avatar-sm { width: 24px; height: 24px; font-size: 10px; }
+.avatar-lg { width: 48px; height: 48px; font-size: 16px; }
+
+.progress-bar { height: 6px; background: var(--input-bg); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
+
+.offline-banner {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  background: var(--warning);
+  color: #14171a;
+  text-align: center;
+  padding: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 10000;
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useCallback, createContext, useContext } = React;
+
+/* ============================================================
+   CONFIGURATION
+============================================================ */
+const API_URL = "https://script.google.com/macros/s/AKfycbxHJ7tT61UEKYC7uTzt0RviNpwEWdOj4znyLO012B73I3zxSfrS2HRW2oJvoA43y2Kk/exec";
+
+/* ============================================================
+   API CLIENT (JSONP)
+============================================================ */
+function apiCall(action, payload = {}) {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const script = document.createElement('script');
+    
+    window[callbackName] = function(data) {
+      if (data.error) reject(new Error(data.error));
+      else resolve(data);
+      delete window[callbackName];
+      document.body.removeChild(script);
+    };
+    
+    const token = localStorage.getItem("calibrate_token");
+    const fullPayload = { action, token, ...payload };
+    const url = API_URL + '?action=' + encodeURIComponent(action) +
+                '&payload=' + encodeURIComponent(JSON.stringify(fullPayload)) +
+                '&callback=' + callbackName;
+    
+    script.src = url;
+    script.onerror = function() {
+      reject(new Error('Network error. Please check your connection.'));
+      delete window[callbackName];
+      document.body.removeChild(script);
+    };
+    document.body.appendChild(script);
+  });
+}
+
+const api = {
+  signup: (email, password, displayName) => apiCall("signup", { email, password, displayName }).then(d => { localStorage.setItem("calibrate_token", d.token); return d; }),
+  login: (email, password) => apiCall("login", { email, password }).then(d => { localStorage.setItem("calibrate_token", d.token); return d; }),
+  logout: () => localStorage.removeItem("calibrate_token"),
+  me: () => apiCall("me"),
+  getWorkspaces: () => apiCall("getWorkspaces"),
+  createWorkspace: (name) => apiCall("createWorkspace", { name }),
+  joinWorkspace: (code) => apiCall("joinWorkspace", { code }),
+  getWorkspaceData: (workspaceId) => apiCall("getWorkspaceData", { workspaceId }),
+  addBean: (workspaceId, bean) => apiCall("addBean", { workspaceId, ...bean }),
+  removeBean: (workspaceId, beanId) => apiCall("removeBean", { workspaceId, beanId }),
+  addShot: (workspaceId, shot) => apiCall("addShot", { workspaceId, ...shot }),
+  addWaste: (workspaceId, waste) => apiCall("addWaste", { workspaceId, ...waste }),
+  addDelivery: (workspaceId, delivery) => apiCall("addDelivery", { workspaceId, ...delivery }),
+  changeRole: (workspaceId, targetUserId, newRole) => apiCall("changeRole", { workspaceId, targetUserId, newRole }),
+  removeMember: (workspaceId, targetUserId) => apiCall("removeMember", { workspaceId, targetUserId }),
+  updateWorkspace: (workspaceId, updates) => apiCall("updateWorkspace", { workspaceId, ...updates }),
+  forgotPassword: (email) => apiCall("forgotPassword", { email }),
+  resetPassword: (email, code, newPassword) => apiCall("resetPassword", { email, code, newPassword }),
+};
+
+/* ============================================================
+   CONSTANTS & HELPERS
+============================================================ */
+const CURRENCIES = ["AED", "USD", "EUR", "GBP", "SAR", "UGX", "KES", "INR"];
+const ROLE_RANK = { barista: 0, manager: 1, owner: 2 };
+const roleLabel = { owner: "Owner", manager: "Manager", barista: "Barista" };
+const canManageBeans = (role) => ROLE_RANK[role] >= 1;
+const canManageTeam = (role) => role === "owner";
+
+const fmtDate = (iso) => new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+const fmtTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+const fmtDateTime = (iso) => `${fmtDate(iso)} · ${fmtTime(iso)}`;
+
+function shotStatus(shot, bean) {
+  if (!bean) return { label: "unlogged", tone: "muted" };
+  if (Number(shot.time_s) < Number(bean.time_min)) return { label: "under · sour", tone: "steel" };
+  if (Number(shot.time_s) > Number(bean.time_max)) return { label: "over · bitter", tone: "rust" };
+  return { label: "optimal", tone: "sage" };
+}
+
+const toneColor = (tone) => ({ steel: "var(--info)", rust: "var(--danger)", sage: "var(--success)", amber: "var(--warning)", muted: "var(--text-muted)" }[tone]);
+
+function dailyUsageKg(beanId, shots, waste, days = 7) {
+  const cutoff = Date.now() - days * 86400000;
+  const usedG = shots.filter(s => s.bean_id === beanId && new Date(s.created_at).getTime() >= cutoff).reduce((a, s) => a + Number(s.dose || 0), 0) +
+    waste.filter(w => w.bean_id === beanId && new Date(w.created_at).getTime() >= cutoff).reduce((a, w) => a + Number(w.amount_g || 0), 0);
+  return usedG / 1000 / days;
+}
+
+function daysRemaining(bean, usage) {
+  if (!usage || usage <= 0) return null;
+  return Number(bean.stock_kg || 0) / usage;
+}
+
+function stockTone(bean, remaining) {
+  const threshold = Number(bean.low_stock_days) || 3;
+  if (remaining === null) return "muted";
+  if (remaining <= threshold) return "rust";
+  if (remaining <= threshold * 2) return "amber";
+  return "sage";
+}
+
+function downloadCSV(filename, rows) {
+  const csv = rows.map(r => r.map(c => `"${String(c ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ============================================================
+   TOAST SYSTEM
+============================================================ */
+const ToastContext = createContext();
+
+function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const addToast = useCallback((message, type = 'success') => {
+    const id = Date.now() + Math.random();
+    setToasts(prev => [...prev, { id, message, type }]);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
+  }, []);
+  const removeToast = useCallback((id) => setToasts(prev => prev.filter(t => t.id !== id)), []);
+  
+  return (
+    <ToastContext.Provider value={{ addToast }}>
+      {children}
+      <div className="toast-container">
+        {toasts.map(toast => (
+          <div key={toast.id} className="toast" onClick={() => removeToast(toast.id)}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: toast.type === 'success' ? 'var(--success)' : toast.type === 'error' ? 'var(--danger)' : 'var(--warning)' }} />
+              <div>{toast.message}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </ToastContext.Provider>
+  );
+}
+const useToast = () => useContext(ToastContext);
+
+/* ============================================================
+   UI COMPONENTS
+============================================================ */
+function Button({ children, variant = 'primary', size = '', style, ...props }) {
+  return <button className={`btn btn-${variant} ${size ? 'btn-' + size : ''}`} style={style} {...props}>{children}</button>;
+}
+function Card({ children, className = '', ...props }) {
+  return <div className={`card ${className}`} {...props}>{children}</div>;
+}
+function Input({ label, ...props }) {
+  return <div>{label && <label className="label">{label}</label>}<input className="input" {...props} /></div>;
+}
+function Select({ label, children, ...props }) {
+  return <div>{label && <label className="label">{label}</label>}<select className="select" {...props}>{children}</select></div>;
+}
+function Textarea({ label, ...props }) {
+  return <div>{label && <label className="label">{label}</label>}<textarea className="textarea" {...props} /></div>;
+}
+function Badge({ children, tone = 'muted' }) {
+  return <span className={`badge badge-${tone}`}>{children}</span>;
+}
+function Avatar({ name, color, size = '' }) {
+  return <div className={`avatar avatar-${size}`} style={{ background: color || 'var(--primary)' }}>{(name || '?').charAt(0).toUpperCase()}</div>;
+}
+function LoadingScreen() {
+  return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ textAlign: 'center' }}><div className="spinner" style={{ width: 40, height: 40, borderWidth: 3 }} /><div style={{ marginTop: 12, color: 'var(--text-muted)' }}>Loading...</div></div></div>;
+}
+
+/* ============================================================
+   AUTH SCREEN
+============================================================ */
+function AuthScreen({ onAuthed }) {
+  const [mode, setMode] = useState('signup');
+  const [showForgot, setShowForgot] = useState(false);
+  const [showReset, setShowReset] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [resetCode, setResetCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
+  const { addToast } = useToast();
+  
+  const submit = async () => {
+    setError(''); setBusy(true);
+    try {
+      if (mode === 'signup') {
+        if (!displayName.trim()) throw new Error('Enter your name.');
+        const data = await api.signup(email.trim(), password, displayName.trim());
+        addToast('Account created! Welcome to Calibrate Pro.', 'success');
+        onAuthed(data.user);
+      } else {
+        const data = await api.login(email.trim(), password);
+        addToast('Welcome back!', 'success');
+        onAuthed(data.user);
+      }
+    } catch (e) { setError(e.message); addToast(e.message, 'error'); }
+    setBusy(false);
+  };
+  
+  const forgotPassword = async () => {
+    if (!email.trim()) { setError('Enter your email first.'); return; }
+    setBusy(true); setError('');
+    try {
+      const result = await api.forgotPassword(email.trim());
+      setMessage(result.message || 'Reset code sent!');
+      setShowForgot(false); setShowReset(true);
+      addToast('Reset code sent!', 'success');
+    } catch (e) { setError(e.message); addToast(e.message, 'error'); }
+    setBusy(false);
+  };
+  
+  const resetPassword = async () => {
+    if (!resetCode.trim() || !newPassword.trim()) { setError('Enter code and new password.'); return; }
+    if (newPassword.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    setBusy(true); setError('');
+    try {
+      await api.resetPassword(email.trim(), resetCode.trim(), newPassword);
+      setMessage('Password reset! Sign in with your new password.');
+      setShowReset(false); setShowForgot(false);
+      setPassword(''); setResetCode(''); setNewPassword('');
+      addToast('Password reset successful!', 'success');
+    } catch (e) { setError(e.message); addToast(e.message, 'error'); }
+    setBusy(false);
+  };
+  
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      <div style={{ width: 420, maxWidth: '100%' }}>
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>☕</div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 600 }}>Calibrate Pro</h1>
+          <p style={{ color: 'var(--text-muted)', marginTop: 4 }}>Dial in every shot. Track everything.</p>
+        </div>
+        
+        {message && <div style={{ background: 'var(--success-dim)', color: 'var(--success)', padding: 12, borderRadius: 8, marginBottom: 12, fontSize: 13 }}>{message}</div>}
+        
+        {showReset ? (
+          <Card>
+            <h3 style={{ marginBottom: 16 }}>Reset Password</h3>
+            <div style={{ display: 'grid', gap: 14 }}>
+              <Input label="Reset Code" value={resetCode} onChange={e => setResetCode(e.target.value)} placeholder="Enter code from email" />
+              <Input label="New Password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="At least 6 characters" />
+              {error && <div style={{ color: 'var(--danger)', fontSize: 13 }}>{error}</div>}
+              <Button onClick={resetPassword} disabled={busy} style={{ justifyContent: 'center' }}>{busy ? 'Resetting...' : 'Reset Password'}</Button>
+              <div onClick={() => { setShowReset(false); setShowForgot(false); setError(''); setMessage(''); }} style={{ textAlign: 'center', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 13 }}>Back to Sign In</div>
+            </div>
+          </Card>
+        ) : showForgot ? (
+          <Card>
+            <h3 style={{ marginBottom: 16 }}>Forgot Password</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: 13, marginBottom: 16 }}>Enter your email and we'll send you a reset code.</p>
+            <div style={{ display: 'grid', gap: 14 }}>
+              <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@email.com" />
+              {error && <div style={{ color: 'var(--danger)', fontSize: 13 }}>{error}</div>}
+              <Button onClick={forgotPassword} disabled={busy} style={{ justifyContent: 'center' }}>{busy ? 'Sending...' : 'Send Reset Code'}</Button>
+              <div onClick={() => { setShowForgot(false); setError(''); }} style={{ textAlign: 'center', color: 'var(--text-muted)', cursor: 'pointer', fontSize: 13 }}>Back to Sign In</div>
+            </div>
+          </Card>
+        ) : (
+          <Card>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+              <button onClick={() => setMode('signin')} className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', background: mode === 'signin' ? 'var(--primary)' : 'transparent', color: mode === 'signin' ? '#14171a' : 'var(--text)' }}>Sign In</button>
+              <button onClick={() => setMode('signup')} className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', background: mode === 'signup' ? 'var(--primary)' : 'transparent', color: mode === 'signup' ? '#14171a' : 'var(--text)' }}>Create Account</button>
+            </div>
+            <div style={{ display: 'grid', gap: 14 }}>
+              {mode === 'signup' && <Input label="Your Name" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Jane Doe" />}
+              <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@email.com" />
+              <Input label="Password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="At least 6 characters" />
+              {error && <div style={{ color: 'var(--danger)', fontSize: 13 }}>{error}</div>}
+              <Button onClick={submit} disabled={busy} style={{ justifyContent: 'center' }}>{busy ? 'Working...' : mode === 'signup' ? 'Create Account' : 'Sign In'}</Button>
+              {mode === 'signin' && <div onClick={() => { setShowForgot(true); setError(''); }} style={{ textAlign: 'center', color: 'var(--primary)', cursor: 'pointer', fontSize: 13 }}>Forgot password?</div>}
+            </div>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   WORKSPACE PICKER
+============================================================ */
+function WorkspacePicker({ onSelect }) {
+  const [workspaces, setWorkspaces] = useState(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [showJoin, setShowJoin] = useState(false);
+  const [name, setName] = useState('');
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
+  const { addToast } = useToast();
+  
+  const load = useCallback(async () => {
+    try { setWorkspaces(await api.getWorkspaces()); }
+    catch (e) { addToast(e.message, 'error'); }
+  }, [addToast]);
+  useEffect(() => { load(); }, [load]);
+  
+  if (!workspaces) return <LoadingScreen />;
+  
+  return (
+    <div style={{ minHeight: '100vh', padding: '40px 20px' }}>
+      <div style={{ maxWidth: 600, margin: '0 auto' }}>
+        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 4 }}>Your Workspaces</h1>
+        <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Pick a café, create a new one, or join with a code.</p>
+        
+        <div className="grid" style={{ marginBottom: 20 }}>
+          {workspaces.map(w => (
+            <Card key={w.workspace.id} className="card-clickable" onClick={() => onSelect(w.workspace, w.role)}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 16 }}>{w.workspace.name}</div>
+                  <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 2 }}>{roleLabel[w.role]}{w.workspace.is_personal ? ' · Personal' : ''}</div>
+                </div>
+                <span style={{ color: 'var(--text-muted)', fontSize: 20 }}>→</span>
+              </div>
+            </Card>
+          ))}
+        </div>
+        
+        <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+          <Button variant="ghost" onClick={() => { setShowCreate(!showCreate); setShowJoin(false); }} style={{ flex: 1, justifyContent: 'center' }}>+ Create Café</Button>
+          <Button variant="ghost" onClick={() => { setShowJoin(!showJoin); setShowCreate(false); }} style={{ flex: 1, justifyContent: 'center' }}>Join with Code</Button>
+        </div>
+        
+        {showCreate && (
+          <Card style={{ marginBottom: 12 }}>
+            <Input label="Café Name" value={name} onChange={e => setName(e.target.value)} placeholder="Kaori Café" />
+            <Button onClick={async () => {
+              if (!name.trim()) return;
+              setBusy(true);
+              try { await api.createWorkspace(name.trim()); addToast('Workspace created!', 'success'); setName(''); setShowCreate(false); await load(); }
+              catch (e) { addToast(e.message, 'error'); }
+              setBusy(false);
+            }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Creating...' : 'Create Workspace'}</Button>
+          </Card>
+        )}
+        
+        {showJoin && (
+          <Card>
+            <Input label="Invite Code" value={code} onChange={e => setCode(e.target.value)} placeholder="ABC123" />
+            <Button onClick={async () => {
+              if (!code.trim()) return;
+              setBusy(true);
+              try { await api.joinWorkspace(code.trim()); addToast('Joined workspace!', 'success'); setCode(''); setShowJoin(false); await load(); }
+              catch (e) { addToast(e.message, 'error'); }
+              setBusy(false);
+            }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Joining...' : 'Join Workspace'}</Button>
+          </Card>
+        )}
+        
+        <div onClick={() => { api.logout(); window.location.reload(); }} style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', marginTop: 24 }}>Sign Out</div>
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   MAIN APP
+============================================================ */
+function MainApp() {
+  const [user, setUser] = useState(undefined);
+  const [workspace, setWorkspace] = useState(null);
+  const [role, setRole] = useState(null);
+  const [tab, setTab] = useState('dashboard');
+  const [data, setData] = useState({ beans: [], shots: [], waste: [], deliveries: [], members: [] });
+  const [loading, setLoading] = useState(false);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const { addToast } = useToast();
+  
+  useEffect(() => {
+    const online = () => setIsOnline(true);
+    const offline = () => setIsOnline(false);
+    window.addEventListener('online', online);
+    window.addEventListener('offline', offline);
+    return () => { window.removeEventListener('online', online); window.removeEventListener('offline', offline); };
+  }, []);
+  
+  useEffect(() => {
+    (async () => {
+      if (!localStorage.getItem('calibrate_token')) { setUser(null); return; }
+      try {
+        setLoading(true);
+        const d = await api.me();
+        setUser(d.user);
+      } catch {
+        localStorage.removeItem('calibrate_token');
+        setUser(null);
+      } finally { setLoading(false); }
+    })();
+  }, []);
+  
+  const loadData = useCallback(async (wsId) => {
+    setLoading(true);
+    try {
+      const d = await api.getWorkspaceData(wsId);
+      setData({ beans: d.beans || [], shots: d.shots || [], waste: d.waste || [], deliveries: d.deliveries || [], members: d.members || [] });
+    } catch (e) { addToast(e.message, 'error'); }
+    finally { setLoading(false); }
+  }, [addToast]);
+  
+  useEffect(() => { if (workspace) loadData(workspace.id); }, [workspace, loadData]);
+  
+  if (user === undefined) return <LoadingScreen />;
+  if (!user) return <AuthScreen onAuthed={(u) => setUser(u)} />;
+  if (!workspace) return <WorkspacePicker onSelect={(ws, r) => { setWorkspace(ws); setRole(r); setTab('dashboard'); }} />;
+  
+  const NAV = [
+    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+    { id: 'log', label: 'Log Shot', icon: '☕' },
+    { id: 'beans', label: 'Beans', icon: '🌱' },
+    { id: 'inventory', label: 'Inventory', icon: '📦' },
+    { id: 'waste', label: 'Waste', icon: '🗑️' },
+    { id: 'team', label: 'Team', icon: '👥' },
+    { id: 'history', label: 'History', icon: '📜' },
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+  ];
+  
+  const refresh = () => loadData(workspace.id);
+  
+  const exportData = () => {
+    const rows = [
+      ["Type", "Bean", "User", "Dose (g)", "Yield (g)", "Time (s)", "Rating", "Notes", "Date"]
+    ];
+    data.shots.forEach(s => {
+      const bean = data.beans.find(b => b.id === s.bean_id);
+      rows.push(["Shot", bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || "", s.created_at]);
+    });
+    data.waste.forEach(w => {
+      const bean = data.beans.find(b => b.id === w.bean_id);
+      rows.push(["Waste", bean?.name || "", w.display_name || "", "", "", "", "", w.reason, w.created_at]);
+    });
+    downloadCSV(`calibrate_export_${new Date().toISOString().split('T')[0]}.csv`, rows);
+    addToast('Data exported!', 'success');
+  };
+  
+  return (
+    <div style={{ minHeight: '100vh' }}>
+      {!isOnline && (
+        <div className="offline-banner">⚠️ You're offline. Changes won't be saved.</div>
+      )}
+      
+      <div className="sidebar">
+        <div style={{ padding: '0 12px 20px', borderBottom: '1px solid var(--border)', marginBottom: 16 }}>
+          <div style={{ fontSize: 24 }}>☕</div>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 18, fontWeight: 600, marginTop: 4 }}>Calibrate Pro</div>
+          <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Espresso Intelligence</div>
+        </div>
+        {NAV.map(item => (
+          <div key={item.id} className={`sidebar-nav-item ${tab === item.id ? 'active' : ''}`} onClick={() => setTab(item.id)}>
+            <span>{item.icon}</span><span>{item.label}</span>
+          </div>
+        ))}
+        <div style={{ flex: 1 }} />
+        <div onClick={exportData} style={{ padding: '8px 12px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, borderRadius: 6, marginBottom: 8 }}>📥 Export Data</div>
+        <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, marginTop: 8 }}>
+          <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{workspace.name}</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '8px 0' }}>
+            <Avatar name={user.display_name} color={user.avatar_color} size="sm" />
+            <div style={{ fontSize: 13 }}>{user.display_name}</div>
+            <Badge tone={role === 'owner' ? 'sage' : role === 'manager' ? 'amber' : 'muted'}>{roleLabel[role]}</Badge>
+          </div>
+          <div onClick={() => { setWorkspace(null); setRole(null); }} style={{ color: 'var(--text-muted)', fontSize: 12, cursor: 'pointer', marginBottom: 6 }}>Switch Workspace</div>
+          <div onClick={() => { api.logout(); setUser(null); setWorkspace(null); }} style={{ color: 'var(--danger)', fontSize: 12, cursor: 'pointer' }}>Sign Out</div>
+        </div>
+      </div>
+      
+      <div className="mobile-nav">
+        {NAV.map(item => (
+          <div key={item.id} onClick={() => setTab(item.id)} style={{ color: tab === item.id ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', fontSize: 10 }}>
+            <div style={{ fontSize: 18 }}>{item.icon}</div><div>{item.label}</div>
+          </div>
+        ))}
+      </div>
+      
+      <div className="main-content">
+        {loading && <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 999 }}><div className="spinner" /></div>}
+        
+        {tab === 'dashboard' && <Dashboard data={data} workspace={workspace} onExport={exportData} />}
+        {tab === 'log' && <LogShot beans={data.beans} onSave={async (shot) => { await api.addShot(workspace.id, shot); addToast('Shot logged!', 'success'); refresh(); }} />}
+        {tab === 'beans' && <Beans beans={data.beans} role={role} onAdd={async (bean) => { await api.addBean(workspace.id, bean); addToast('Bean added!', 'success'); refresh(); }} onRemove={async (id) => { if (window.confirm('Remove this bean? This cannot be undone.')) { await api.removeBean(workspace.id, id); addToast('Bean removed', 'success'); refresh(); } }} />}
+        {tab === 'inventory' && <Inventory beans={data.beans} shots={data.shots} waste={data.waste} role={role} currency={workspace.currency} onDeliver={async (d) => { await api.addDelivery(workspace.id, d); addToast('Delivery recorded!', 'success'); refresh(); }} />}
+        {tab === 'waste' && <Waste beans={data.beans} waste={data.waste} onAdd={async (w) => { await api.addWaste(workspace.id, w); addToast('Waste logged!', 'success'); refresh(); }} />}
+        {tab === 'team' && <Team data={data} workspace={workspace} role={role} userId={user.id} onChangeRole={async (uid, r) => { await api.changeRole(workspace.id, uid, r); addToast('Role updated!', 'success'); refresh(); }} onRemove={async (uid) => { if (window.confirm('Remove this member?')) { await api.removeMember(workspace.id, uid); addToast('Member removed', 'success'); refresh(); } }} />}
+        {tab === 'history' && <History shots={data.shots} beans={data.beans} onExport={() => { const rows = [["Date", "Bean", "Barista", "Dose", "Yield", "Time", "Rating", "Notes"]]; data.shots.forEach(s => { const bean = data.beans.find(b => b.id === s.bean_id); rows.push([s.created_at, bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || ""]); }); downloadCSV('shot_history.csv', rows); addToast('History exported!', 'success'); }} />}
+        {tab === 'settings' && <Settings workspace={workspace} role={role} onUpdate={async (fields) => { await api.updateWorkspace(workspace.id, fields); setWorkspace(w => ({ ...w, ...fields })); addToast('Settings updated!', 'success'); }} />}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   DASHBOARD
+============================================================ */
+function Dashboard({ data, workspace, onExport }) {
+  const { beans, shots, waste } = data;
+  const today = new Date().toDateString();
+  const shotsToday = shots.filter(s => new Date(s.created_at).toDateString() === today).length;
+  const wasteToday = waste.filter(w => new Date(w.created_at).toDateString() === today).reduce((a, w) => a + Number(w.amount_g || 0), 0);
+  
+  const onTargetPct = useMemo(() => {
+    const withBean = shots.filter(s => beans.find(b => b.id === s.bean_id));
+    if (!withBean.length) return null;
+    const optimal = withBean.filter(s => shotStatus(s, beans.find(b => b.id === s.bean_id)).tone === 'sage');
+    return Math.round((optimal.length / withBean.length) * 100);
+  }, [shots, beans]);
+  
+  const stats = [
+    { label: 'Shots Today', value: shotsToday, icon: '☕', color: 'var(--primary)' },
+    { label: 'Waste Today', value: `${wasteToday}g`, icon: '🗑️', color: 'var(--warning)' },
+    { label: 'On-Target', value: onTargetPct === null ? '—' : `${onTargetPct}%`, icon: '🎯', color: onTargetPct >= 70 ? 'var(--success)' : 'var(--danger)' },
+    { label: 'Beans', value: beans.length, icon: '🌱', color: 'var(--info)' },
+  ];
+  
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 4 }}>Dashboard</h1>
+          <p style={{ color: 'var(--text-muted)' }}>{workspace.name}</p>
+        </div>
+        <Button variant="ghost" size="sm" onClick={onExport}>📥 Export</Button>
+      </div>
+      
+      <div className="grid grid-4">
+        {stats.map(s => (
+          <Card key={s.label}>
+            <div style={{ fontSize: 24 }}>{s.icon}</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: 28, fontWeight: 600, margin: '4px 0', color: s.color }}>{s.value}</div>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>{s.label}</div>
+          </Card>
+        ))}
+      </div>
+      
+      <Card style={{ marginTop: 16 }}>
+        <h3 style={{ marginBottom: 16 }}>Recent Activity</h3>
+        {shots.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: 40 }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>☕</div>
+            <div style={{ fontWeight: 600, fontSize: 16 }}>Welcome to Calibrate Pro!</div>
+            <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Start by adding beans, then log your first shot.</p>
+          </div>
+        ) : shots.slice(0, 8).map(s => {
+          const bean = beans.find(b => b.id === s.bean_id);
+          const status = shotStatus(s, bean);
+          return (
+            <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Avatar name={s.display_name} color={s.avatar_color} size="sm" />
+                <div>
+                  <div style={{ fontWeight: 500 }}>{bean?.name || 'Unknown'}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{s.dose}g → {s.yield}g in {s.time_s}s · {fmtTime(s.created_at)}</div>
+                </div>
+              </div>
+              <Badge tone={status.tone}>{status.label}</Badge>
+            </div>
+          );
+        })}
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================
+   LOG SHOT
+============================================================ */
+function LogShot({ beans, onSave }) {
+  const [beanId, setBeanId] = useState(beans[0]?.id || '');
+  const [dose, setDose] = useState(beans[0]?.dose_target || '');
+  const [yieldG, setYieldG] = useState(beans[0]?.yield_target || '');
+  const [time, setTime] = useState('');
+  const [rating, setRating] = useState(3);
+  const [notes, setNotes] = useState('');
+  const [saved, setSaved] = useState(false);
+  const [busy, setBusy] = useState(false);
+  
+  const bean = beans.find(b => b.id === beanId);
+  const ratio = dose && yieldG ? (Number(yieldG) / Number(dose)).toFixed(2) : null;
+  const canSave = beanId && dose && yieldG && time;
+  
+  const save = async () => {
+    setBusy(true);
+    await onSave({ beanId, dose: Number(dose), yield: Number(yieldG), timeS: Number(time), ratio: Number(ratio), rating, notes: notes.trim() });
+    setSaved(true); setDose(''); setYieldG(''); setTime(''); setNotes(''); setRating(3); setBusy(false);
+    setTimeout(() => setSaved(false), 1800);
+  };
+  
+  if (beans.length === 0) {
+    return <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 16 }}>Log Shot</h1><Card><div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Add a bean profile first.</div></Card></div>;
+  }
+  
+  return (
+    <div>
+      <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 4 }}>Log Shot</h1>
+      <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Record your extraction details</p>
+      
+      <Card style={{ maxWidth: 600 }}>
+        <div className="grid">
+          <Select label="Bean" value={beanId} onChange={e => { setBeanId(e.target.value); const b = beans.find(x => x.id === e.target.value); if (b) { setDose(b.dose_target || ''); setYieldG(b.yield_target || ''); } }}>
+            {beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </Select>
+          <div className="grid grid-3">
+            <Input label="Dose (g)" type="number" step="0.1" value={dose} onChange={e => setDose(e.target.value)} />
+            <Input label="Yield (g)" type="number" step="0.1" value={yieldG} onChange={e => setYieldG(e.target.value)} />
+            <Input label="Time (s)" type="number" value={time} onChange={e => setTime(e.target.value)} />
+          </div>
+          {ratio && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--primary)' }}>Ratio 1:{ratio}</div>}
+          <div>
+            <label className="label">Taste Rating (1 = sour, 5 = bitter)</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {[1, 2, 3, 4, 5].map(n => (
+                <div key={n} onClick={() => setRating(n)} style={{ width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 14, background: rating === n ? 'var(--primary)' : 'var(--input-bg)', color: rating === n ? '#14171a' : 'var(--text-muted)', border: '1px solid var(--border)', transition: 'all 0.2s' }}>{n}</div>
+              ))}
+            </div>
+          </div>
+          <Textarea label="Notes (optional)" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Channeling on left side..." />
+          <Button onClick={save} disabled={!canSave || busy} style={{ justifyContent: 'center', opacity: canSave ? 1 : 0.5 }}>{saved ? '✓ Logged!' : busy ? 'Saving...' : 'Save Shot'}</Button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================
+   BEANS
+============================================================ */
+function Beans({ beans, role, onAdd, onRemove }) {
+  const [showForm, setShowForm] = useState(false);
+  const locked = !canManageBeans(role);
+  
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>Beans</h1><p style={{ color: 'var(--text-muted)' }}>Manage your coffee profiles</p></div>
+        {!locked && <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : '+ Add Bean'}</Button>}
+      </div>
+      
+      {showForm && !locked && <BeanForm onSave={onAdd} onClose={() => setShowForm(false)} />}
+      
+      {beans.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No beans yet. Add your first bean!</div></Card> : (
+        <div className="grid grid-2">
+          {beans.map(b => (
+            <Card key={b.id}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                <div><div style={{ fontWeight: 600, fontSize: 16 }}>{b.name}</div>{b.origin && <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{b.origin}</div>}</div>
+                {!locked && <button onClick={() => onRemove(b.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 18 }}>×</button>}
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{b.dose_target}g → {b.yield_target}g · {b.time_min}–{b.time_max}s</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Stock: {Number(b.stock_kg || 0).toFixed(1)}kg</div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BeanForm({ onSave, onClose }) {
+  const [f, setF] = useState({ name: '', origin: '', roaster: '', roastDate: '', doseTarget: '18', yieldTarget: '36', timeMin: '25', timeMax: '32', stockKg: '', costPerKg: '', lowStockDays: '3' });
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  const save = async () => {
+    if (!f.name.trim()) return;
+    await onSave({ name: f.name.trim(), origin: f.origin.trim(), roaster: f.roaster.trim(), roastDate: f.roastDate, doseTarget: Number(f.doseTarget), yieldTarget: Number(f.yieldTarget), timeMin: Number(f.timeMin), timeMax: Number(f.timeMax), stockKg: Number(f.stockKg) || 0, costPerKg: f.costPerKg ? Number(f.costPerKg) : '', lowStockDays: Number(f.lowStockDays) || 3 });
+    onClose();
+  };
+  
+  return (
+    <Card style={{ marginBottom: 16 }}>
+      <div className="grid">
+        <Input label="Bean Name *" value={f.name} onChange={set('name')} placeholder="Ethiopia Yirgacheffe" />
+        <div className="grid grid-2">
+          <Input label="Origin" value={f.origin} onChange={set('origin')} placeholder="Ethiopia" />
+          <Input label="Roaster" value={f.roaster} onChange={set('roaster')} placeholder="Local Roasters" />
+        </div>
+        <Input label="Roast Date" type="date" value={f.roastDate} onChange={set('roastDate')} />
+        <div className="grid grid-2">
+          <Input label="Dose Target (g)" type="number" value={f.doseTarget} onChange={set('doseTarget')} />
+          <Input label="Yield Target (g)" type="number" value={f.yieldTarget} onChange={set('yieldTarget')} />
+        </div>
+        <div className="grid grid-2">
+          <Input label="Time Min (s)" type="number" value={f.timeMin} onChange={set('timeMin')} />
+          <Input label="Time Max (s)" type="number" value={f.timeMax} onChange={set('timeMax')} />
+        </div>
+        <div className="grid grid-3">
+          <Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} />
+          <Input label="Cost/kg" type="number" step="0.01" value={f.costPerKg} onChange={set('costPerKg')} />
+          <Input label="Low Stock (days)" type="number" value={f.lowStockDays} onChange={set('lowStockDays')} />
+        </div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Button onClick={save} style={{ flex: 1, justifyContent: 'center' }}>Save Bean</Button>
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+/* ============================================================
+   INVENTORY
+============================================================ */
+function Inventory({ beans, shots, waste, role, currency, onDeliver }) {
+  const locked = !canManageBeans(role);
+  const rows = useMemo(() => beans.map(b => {
+    const usage = dailyUsageKg(b.id, shots, waste);
+    const rem = daysRemaining(b, usage);
+    return { ...b, usage, rem, tone: stockTone(b, rem) };
+  }), [beans, shots, waste]);
+  
+  return (
+    <div>
+      <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 4 }}>Inventory</h1>
+      <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Stock levels and usage</p>
+      
+      {beans.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>Add beans first.</div></Card> : (
+        <div className="grid">
+          {rows.map(r => (
+            <Card key={r.id}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                <div><div style={{ fontWeight: 600 }}>{r.name}</div><div style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{Number(r.stock_kg || 0).toFixed(1)}kg · ~{(r.usage * 1000).toFixed(0)}g/day</div></div>
+                <Badge tone={r.tone}>{r.rem === null ? 'No data' : `${r.rem.toFixed(1)} days`}</Badge>
+              </div>
+              <div className="progress-bar"><div className="progress-fill" style={{ width: `${Math.min(100, r.rem === null ? 100 : (r.rem / 14) * 100)}%`, background: toneColor(r.tone) }} /></div>
+            </Card>
+          ))}
+        </div>
+      )}
+      
+      {!locked && beans.length > 0 && (
+        <Card style={{ marginTop: 16 }}>
+          <h3 style={{ marginBottom: 12 }}>Record Delivery</h3>
+          <DeliveryForm beans={beans} onSave={onDeliver} />
+        </Card>
+      )}
+    </div>
+  );
+}
+
+function DeliveryForm({ beans, onSave }) {
+  const [beanId, setBeanId] = useState(beans[0]?.id || '');
+  const [kg, setKg] = useState('');
+  const [cost, setCost] = useState('');
+  const [supplier, setSupplier] = useState('');
+  const submit = async () => { if (!beanId || !kg) return; await onSave({ beanId, kg: Number(kg), costPerKg: cost ? Number(cost) : '', supplier: supplier.trim() }); setKg(''); setCost(''); setSupplier(''); };
+  
+  return (
+    <div className="grid">
+      <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
+      <div className="grid grid-3">
+        <Input label="Kg" type="number" step="0.1" value={kg} onChange={e => setKg(e.target.value)} />
+        <Input label="Cost/kg" type="number" step="0.01" value={cost} onChange={e => setCost(e.target.value)} />
+        <Input label="Supplier" value={supplier} onChange={e => setSupplier(e.target.value)} />
+      </div>
+      <Button onClick={submit} style={{ justifyContent: 'center' }}>Add Delivery</Button>
+    </div>
+  );
+}
+
+/* ============================================================
+   WASTE
+============================================================ */
+const WASTE_REASONS = ["Dial-in", "Channeling", "Wrong grind", "Order changed", "Dropped", "Other"];
+
+function Waste({ beans, waste, onAdd }) {
+  const [beanId, setBeanId] = useState(beans[0]?.id || '');
+  const [amount, setAmount] = useState('');
+  const [reason, setReason] = useState(WASTE_REASONS[0]);
+  const todayTotal = waste.filter(w => new Date(w.created_at).toDateString() === new Date().toDateString()).reduce((a, w) => a + Number(w.amount_g || 0), 0);
+  const save = async () => { if (!amount || !beanId) return; await onAdd({ beanId, amountG: Number(amount), reason }); setAmount(''); };
+  
+  return (
+    <div>
+      <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 4 }}>Waste</h1>
+      <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>{todayTotal}g logged today</p>
+      
+      <Card style={{ maxWidth: 500, marginBottom: 16 }}>
+        <div className="grid">
+          <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
+          <div className="grid grid-2">
+            <Input label="Amount (g)" type="number" value={amount} onChange={e => setAmount(e.target.value)} />
+            <Select label="Reason" value={reason} onChange={e => setReason(e.target.value)}>{WASTE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}</Select>
+          </div>
+          <Button onClick={save} disabled={!beans.length} style={{ justifyContent: 'center' }}>Log Waste</Button>
+        </div>
+      </Card>
+      
+      {waste.slice(0, 10).map(w => {
+        const bean = beans.find(b => b.id === w.bean_id);
+        return (
+          <Card key={w.id} style={{ marginBottom: 8 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div><div style={{ fontWeight: 500 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{w.reason} · {w.display_name}</div></div>
+              <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--warning)' }}>{w.amount_g}g</div>
+            </div>
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ============================================================
+   TEAM
+============================================================ */
+function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
+  const { members, shots, waste } = data;
+  const { addToast } = useToast();
+  
+  const stats = useMemo(() => members.map(m => {
+    const mShots = shots.filter(s => s.user_id === m.user_id);
+    const mWaste = waste.filter(w => w.user_id === m.user_id);
+    const wasteG = mWaste.reduce((a, w) => a + Number(w.amount_g || 0), 0);
+    const avgTime = mShots.length ? (mShots.reduce((a, s) => a + Number(s.time_s), 0) / mShots.length).toFixed(1) : '0';
+    return { ...m, shotCount: mShots.length, wasteG, avgTime };
+  }).sort((a, b) => b.shotCount - a.shotCount), [members, shots, waste]);
+  
+  const copyCode = () => { navigator.clipboard?.writeText(workspace.invite_code); addToast('Invite code copied!', 'success'); };
+  
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>Team</h1><p style={{ color: 'var(--text-muted)' }}>Invite code: {workspace.invite_code}</p></div>
+        <Button variant="ghost" onClick={copyCode}>Copy Invite Code</Button>
+      </div>
+      
+      <div className="grid">
+        {stats.map(s => (
+          <Card key={s.user_id}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+              <Avatar name={s.display_name} color={s.avatar_color} size="lg" />
+              <div><div style={{ fontWeight: 600 }}>{s.display_name}{s.user_id === userId ? ' (you)' : ''}</div><Badge tone={s.role === 'owner' ? 'sage' : s.role === 'manager' ? 'amber' : 'muted'}>{roleLabel[s.role]}</Badge></div>
+            </div>
+            <div style={{ display: 'flex', gap: 16, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)' }}>
+              <div>{s.shotCount} shots</div><div>avg {s.avgTime}s</div><div>{s.wasteG}g waste</div>
+            </div>
+            {canManageTeam(role) && (
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
+                <Select value={s.role} onChange={e => onChangeRole(s.user_id, e.target.value)}>
+                  <option value="barista">Barista</option><option value="manager">Manager</option><option value="owner">Owner</option>
+                </Select>
+                {s.user_id !== userId && <Button variant="danger" size="sm" onClick={() => onRemove(s.user_id)}>Remove</Button>}
+              </div>
+            )}
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================
+   HISTORY
+============================================================ */
+function History({ shots, beans, onExport }) {
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>History</h1><p style={{ color: 'var(--text-muted)' }}>{shots.length} total shots</p></div>
+        {shots.length > 0 && <Button variant="ghost" size="sm" onClick={onExport}>📥 Export CSV</Button>}
+      </div>
+      
+      <Card>
+        {shots.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shots yet.</div> : shots.map(s => {
+          const bean = beans.find(b => b.id === s.bean_id);
+          const status = shotStatus(s, bean);
+          return (
+            <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
+              <div><div style={{ fontWeight: 500 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}</div></div>
+              <div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 12 }}><div>{s.dose}g:{s.yield}g · {s.time_s}s</div><Badge tone={status.tone}>{status.label}</Badge></div>
+            </div>
+          );
+        })}
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================
+   SETTINGS
+============================================================ */
+function Settings({ workspace, role, onUpdate }) {
+  const editable = canManageTeam(role);
+  return (
+    <div>
+      <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 24 }}>Settings</h1>
+      <Card style={{ maxWidth: 400 }}>
+        <label className="label">Currency</label>
+        {editable ? <Select value={workspace.currency} onChange={e => onUpdate({ currency: e.target.value })}>{CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}</Select> : <div>{workspace.currency}</div>}
+      </Card>
+    </div>
+  );
+}
+
+/* ============================================================
+   ROOT
+============================================================ */
+function Root() {
+  return <ToastProvider><MainApp /></ToastProvider>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
+</script>
+</body>
+</html>
