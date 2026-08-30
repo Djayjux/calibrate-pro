@@ -2,11 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>Calibrate Pro — Espresso Intelligence Platform</title>
 <meta name="description" content="Track espresso shots, manage bean inventory, and analyze team performance." />
+<meta name="theme-color" content="#c4a572" />
+
+<!-- PWA Manifest -->
+<link rel="manifest" href='data:application/json,{"name":"Calibrate Pro","short_name":"Calibrate","description":"Espresso calibration and inventory management","start_url":".","display":"standalone","background_color":"#0f1115","theme_color":"#c4a572","icons":[{"src":"data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%23c4a572%27/><text x=%2750%27 y=%2765%27 font-size=%2750%27 text-anchor=%27middle%27>☕</text></svg>","sizes":"192x192","type":"image/svg+xml"},{"src":"data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%23c4a572%27/><text x=%2750%27 y=%2765%27 font-size=%2750%27 text-anchor=%27middle%27>☕</text></svg>","sizes":"512x512","type":"image/svg+xml"}]}' />
+
+<!-- iOS PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Calibrate Pro" />
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c4a572'/><text x='50' y='65' font-size='50' text-anchor='middle'>☕</text></svg>" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
 <style>
 :root {
   --bg: #0f1115;
@@ -48,6 +60,7 @@ body {
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
 }
 
 #root { min-height: 100vh; }
@@ -65,6 +78,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 
 .fade-in { animation: fadeIn 0.3s ease-out; }
 .slide-in { animation: slideIn 0.3s ease-out; }
@@ -79,6 +93,14 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
   animation: spin 0.6s linear infinite;
 }
 
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse 2s ease-in-out infinite;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -91,7 +113,9 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
   font-size: 14px;
   transition: var(--transition);
   text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
+.btn:active { transform: scale(0.97); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn-primary { background: var(--primary); color: #14171a; }
 .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
@@ -100,6 +124,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger-dim); }
 .btn-danger:hover { background: var(--danger-dim); }
 .btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-lg { padding: 14px 24px; font-size: 16px; }
 
 .card {
   background: var(--card);
@@ -111,6 +136,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 .card:hover { border-color: #3a3e45; }
 .card-clickable { cursor: pointer; }
 .card-clickable:hover { background: var(--card-hover); }
+.card-clickable:active { transform: scale(0.98); }
 
 .input, .select, .textarea {
   width: 100%;
@@ -122,6 +148,8 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
   font-size: 14px;
   outline: none;
   transition: var(--transition);
+  -webkit-appearance: none;
+  appearance: none;
 }
 .input:focus, .select:focus, .textarea:focus {
   border-color: var(--primary);
@@ -150,6 +178,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
   text-transform: uppercase;
   padding: 4px 8px;
   border-radius: 4px;
+  white-space: nowrap;
 }
 .badge-sage { color: var(--success); background: var(--success-dim); border: 1px solid var(--success); }
 .badge-rust { color: var(--danger); background: var(--danger-dim); border: 1px solid var(--danger); }
@@ -165,8 +194,9 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 @media (max-width: 768px) {
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .sidebar { display: none !important; }
-  .main-content { margin-left: 0 !important; padding: 16px !important; padding-bottom: 80px !important; }
+  .main-content { margin-left: 0 !important; padding: 16px !important; padding-bottom: 90px !important; }
   .mobile-nav { display: flex !important; }
+  .quick-fab { display: flex !important; }
 }
 
 .toast-container {
@@ -201,6 +231,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
   top: 0; left: 0; bottom: 0;
   background: var(--bg);
   z-index: 100;
+  overflow-y: auto;
 }
 .sidebar-nav-item {
   display: flex;
@@ -227,7 +258,29 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
   padding: 8px;
   z-index: 100;
   justify-content: space-around;
+  backdrop-filter: blur(10px);
 }
+
+.quick-fab {
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 100;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #14171a;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  animation: bounce 2s ease-in-out infinite;
+}
+.quick-fab:active { transform: scale(0.9); }
 
 .avatar {
   width: 32px;
@@ -258,6 +311,12 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
   font-weight: 500;
   z-index: 10000;
 }
+
+.alert-card {
+  border-color: var(--danger) !important;
+  background: var(--danger-dim) !important;
+}
+.alert-card:hover { border-color: var(--danger) !important; }
 </style>
 </head>
 <body>
@@ -268,7 +327,7 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo, useCallback, createContext, useContext } = React;
+const { useState, useEffect, useMemo, useCallback, createContext, useContext, useRef } = React;
 
 /* ============================================================
    CONFIGURATION
@@ -503,7 +562,7 @@ function AuthScreen({ onAuthed }) {
     <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
       <div style={{ width: 420, maxWidth: '100%' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>☕</div>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>☕</div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 32, fontWeight: 600 }}>Calibrate Pro</h1>
           <p style={{ color: 'var(--text-muted)', marginTop: 4 }}>Dial in every shot. Track everything.</p>
         </div>
@@ -535,8 +594,8 @@ function AuthScreen({ onAuthed }) {
         ) : (
           <Card>
             <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-              <button onClick={() => setMode('signin')} className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', background: mode === 'signin' ? 'var(--primary)' : 'transparent', color: mode === 'signin' ? '#14171a' : 'var(--text)' }}>Sign In</button>
-              <button onClick={() => setMode('signup')} className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', background: mode === 'signup' ? 'var(--primary)' : 'transparent', color: mode === 'signup' ? '#14171a' : 'var(--text)' }}>Create Account</button>
+              <button onClick={() => setMode('signin')} className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', background: mode === 'signin' ? 'var(--primary)' : 'transparent', color: mode === 'signin' ? '#14171a' : 'var(--text)', border: mode === 'signin' ? 'none' : '1px solid var(--border)' }}>Sign In</button>
+              <button onClick={() => setMode('signup')} className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', background: mode === 'signup' ? 'var(--primary)' : 'transparent', color: mode === 'signup' ? '#14171a' : 'var(--text)', border: mode === 'signup' ? 'none' : '1px solid var(--border)' }}>Create Account</button>
             </div>
             <div style={{ display: 'grid', gap: 14 }}>
               {mode === 'signup' && <Input label="Your Name" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Jane Doe" />}
@@ -676,6 +735,13 @@ function MainApp() {
   
   useEffect(() => { if (workspace) loadData(workspace.id); }, [workspace, loadData]);
   
+  // Auto-backup to localStorage
+  useEffect(() => {
+    if (workspace && data.shots.length > 0) {
+      localStorage.setItem('calibrate_backup_' + workspace.id, JSON.stringify(data));
+    }
+  }, [data, workspace]);
+  
   if (user === undefined) return <LoadingScreen />;
   if (!user) return <AuthScreen onAuthed={(u) => setUser(u)} />;
   if (!workspace) return <WorkspacePicker onSelect={(ws, r) => { setWorkspace(ws); setRole(r); setTab('dashboard'); }} />;
@@ -694,9 +760,7 @@ function MainApp() {
   const refresh = () => loadData(workspace.id);
   
   const exportData = () => {
-    const rows = [
-      ["Type", "Bean", "User", "Dose (g)", "Yield (g)", "Time (s)", "Rating", "Notes", "Date"]
-    ];
+    const rows = [["Type", "Bean", "User", "Dose (g)", "Yield (g)", "Time (s)", "Rating", "Notes", "Date"]];
     data.shots.forEach(s => {
       const bean = data.beans.find(b => b.id === s.bean_id);
       rows.push(["Shot", bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || "", s.created_at]);
@@ -706,7 +770,7 @@ function MainApp() {
       rows.push(["Waste", bean?.name || "", w.display_name || "", "", "", "", "", w.reason, w.created_at]);
     });
     downloadCSV(`calibrate_export_${new Date().toISOString().split('T')[0]}.csv`, rows);
-    addToast('Data exported!', 'success');
+    addToast('Data exported successfully!', 'success');
   };
   
   return (
@@ -715,19 +779,29 @@ function MainApp() {
         <div className="offline-banner">⚠️ You're offline. Changes won't be saved.</div>
       )}
       
+      {loading && <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 999 }}><div className="spinner" /></div>}
+      
+      {/* Sidebar */}
       <div className="sidebar">
         <div style={{ padding: '0 12px 20px', borderBottom: '1px solid var(--border)', marginBottom: 16 }}>
           <div style={{ fontSize: 24 }}>☕</div>
           <div style={{ fontFamily: 'var(--font-heading)', fontSize: 18, fontWeight: 600, marginTop: 4 }}>Calibrate Pro</div>
           <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>Espresso Intelligence</div>
         </div>
+        
         {NAV.map(item => (
           <div key={item.id} className={`sidebar-nav-item ${tab === item.id ? 'active' : ''}`} onClick={() => setTab(item.id)}>
-            <span>{item.icon}</span><span>{item.label}</span>
+            <span>{item.icon}</span>
+            <span>{item.label}</span>
           </div>
         ))}
+        
         <div style={{ flex: 1 }} />
-        <div onClick={exportData} style={{ padding: '8px 12px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, borderRadius: 6, marginBottom: 8 }}>📥 Export Data</div>
+        
+        <div onClick={exportData} style={{ padding: '8px 12px', cursor: 'pointer', color: 'var(--text-muted)', fontSize: 12, borderRadius: 6, marginBottom: 8, transition: 'all 0.2s' }} className="sidebar-nav-item">
+          📥 Export Data
+        </div>
+        
         <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16, marginTop: 8 }}>
           <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{workspace.name}</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '8px 0' }}>
@@ -740,17 +814,23 @@ function MainApp() {
         </div>
       </div>
       
+      {/* Mobile Nav */}
       <div className="mobile-nav">
         {NAV.map(item => (
-          <div key={item.id} onClick={() => setTab(item.id)} style={{ color: tab === item.id ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', fontSize: 10 }}>
-            <div style={{ fontSize: 18 }}>{item.icon}</div><div>{item.label}</div>
+          <div key={item.id} onClick={() => setTab(item.id)} style={{ color: tab === item.id ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', fontSize: 10, padding: '4px 6px' }}>
+            <div style={{ fontSize: 18 }}>{item.icon}</div>
+            <div>{item.label}</div>
           </div>
         ))}
       </div>
       
+      {/* Quick Action FAB */}
+      <button className="quick-fab" onClick={() => setTab('log')} title="Quick Log Shot">
+        +
+      </button>
+      
+      {/* Main Content */}
       <div className="main-content">
-        {loading && <div style={{ position: 'fixed', top: 20, right: 20, zIndex: 999 }}><div className="spinner" /></div>}
-        
         {tab === 'dashboard' && <Dashboard data={data} workspace={workspace} onExport={exportData} />}
         {tab === 'log' && <LogShot beans={data.beans} onSave={async (shot) => { await api.addShot(workspace.id, shot); addToast('Shot logged!', 'success'); refresh(); }} />}
         {tab === 'beans' && <Beans beans={data.beans} role={role} onAdd={async (bean) => { await api.addBean(workspace.id, bean); addToast('Bean added!', 'success'); refresh(); }} onRemove={async (id) => { if (window.confirm('Remove this bean? This cannot be undone.')) { await api.removeBean(workspace.id, id); addToast('Bean removed', 'success'); refresh(); } }} />}
@@ -780,6 +860,14 @@ function Dashboard({ data, workspace, onExport }) {
     return Math.round((optimal.length / withBean.length) * 100);
   }, [shots, beans]);
   
+  const lowStockBeans = useMemo(() => {
+    return beans.filter(b => {
+      const usage = dailyUsageKg(b.id, shots, waste);
+      const remaining = daysRemaining(b, usage);
+      return remaining !== null && remaining <= Number(b.low_stock_days || 3);
+    });
+  }, [beans, shots, waste]);
+  
   const stats = [
     { label: 'Shots Today', value: shotsToday, icon: '☕', color: 'var(--primary)' },
     { label: 'Waste Today', value: `${wasteToday}g`, icon: '🗑️', color: 'var(--warning)' },
@@ -789,13 +877,27 @@ function Dashboard({ data, workspace, onExport }) {
   
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
         <div>
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 4 }}>Dashboard</h1>
           <p style={{ color: 'var(--text-muted)' }}>{workspace.name}</p>
         </div>
         <Button variant="ghost" size="sm" onClick={onExport}>📥 Export</Button>
       </div>
+      
+      {lowStockBeans.length > 0 && (
+        <Card className="alert-card" style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ fontSize: 24 }}>⚠️</span>
+            <div>
+              <div style={{ fontWeight: 600, color: 'var(--danger)' }}>Low Stock Alert!</div>
+              <div style={{ fontSize: 13, color: 'var(--text-muted)' }}>
+                {lowStockBeans.map(b => b.name).join(', ')} {lowStockBeans.length === 1 ? 'is' : 'are'} running low.
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
       
       <div className="grid grid-4">
         {stats.map(s => (
@@ -854,14 +956,22 @@ function LogShot({ beans, onSave }) {
   const canSave = beanId && dose && yieldG && time;
   
   const save = async () => {
+    if (!canSave) return;
     setBusy(true);
     await onSave({ beanId, dose: Number(dose), yield: Number(yieldG), timeS: Number(time), ratio: Number(ratio), rating, notes: notes.trim() });
-    setSaved(true); setDose(''); setYieldG(''); setTime(''); setNotes(''); setRating(3); setBusy(false);
+    setSaved(true);
+    setDose(''); setYieldG(''); setTime(''); setNotes(''); setRating(3);
+    setBusy(false);
     setTimeout(() => setSaved(false), 1800);
   };
   
   if (beans.length === 0) {
-    return <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 16 }}>Log Shot</h1><Card><div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Add a bean profile first.</div></Card></div>;
+    return (
+      <div>
+        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 16 }}>Log Shot</h1>
+        <Card><div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Add a bean profile first.</div></Card>
+      </div>
+    );
   }
   
   return (
@@ -871,25 +981,36 @@ function LogShot({ beans, onSave }) {
       
       <Card style={{ maxWidth: 600 }}>
         <div className="grid">
-          <Select label="Bean" value={beanId} onChange={e => { setBeanId(e.target.value); const b = beans.find(x => x.id === e.target.value); if (b) { setDose(b.dose_target || ''); setYieldG(b.yield_target || ''); } }}>
+          <Select label="Bean" value={beanId} onChange={e => {
+            setBeanId(e.target.value);
+            const b = beans.find(x => x.id === e.target.value);
+            if (b) { setDose(b.dose_target || ''); setYieldG(b.yield_target || ''); }
+          }}>
             {beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
           </Select>
+          
           <div className="grid grid-3">
-            <Input label="Dose (g)" type="number" step="0.1" value={dose} onChange={e => setDose(e.target.value)} />
-            <Input label="Yield (g)" type="number" step="0.1" value={yieldG} onChange={e => setYieldG(e.target.value)} />
-            <Input label="Time (s)" type="number" value={time} onChange={e => setTime(e.target.value)} />
+            <Input label="Dose (g)" type="number" step="0.1" value={dose} onChange={e => setDose(e.target.value)} placeholder="18" />
+            <Input label="Yield (g)" type="number" step="0.1" value={yieldG} onChange={e => setYieldG(e.target.value)} placeholder="36" />
+            <Input label="Time (s)" type="number" value={time} onChange={e => setTime(e.target.value)} placeholder="28" />
           </div>
+          
           {ratio && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 14, color: 'var(--primary)' }}>Ratio 1:{ratio}</div>}
+          
           <div>
             <label className="label">Taste Rating (1 = sour, 5 = bitter)</label>
             <div style={{ display: 'flex', gap: 8 }}>
               {[1, 2, 3, 4, 5].map(n => (
-                <div key={n} onClick={() => setRating(n)} style={{ width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 14, background: rating === n ? 'var(--primary)' : 'var(--input-bg)', color: rating === n ? '#14171a' : 'var(--text-muted)', border: '1px solid var(--border)', transition: 'all 0.2s' }}>{n}</div>
+                <div key={n} onClick={() => setRating(n)} style={{ width: 44, height: 44, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 14, background: rating === n ? 'var(--primary)' : 'var(--input-bg)', color: rating === n ? '#14171a' : 'var(--text-muted)', border: '1px solid var(--border)', transition: 'all 0.2s' }}>{n}</div>
               ))}
             </div>
           </div>
+          
           <Textarea label="Notes (optional)" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Channeling on left side..." />
-          <Button onClick={save} disabled={!canSave || busy} style={{ justifyContent: 'center', opacity: canSave ? 1 : 0.5 }}>{saved ? '✓ Logged!' : busy ? 'Saving...' : 'Save Shot'}</Button>
+          
+          <Button onClick={save} disabled={!canSave || busy} style={{ justifyContent: 'center', opacity: canSave ? 1 : 0.5 }}>
+            {saved ? '✓ Logged!' : busy ? 'Saving...' : 'Save Shot'}
+          </Button>
         </div>
       </Card>
     </div>
@@ -905,23 +1026,39 @@ function Beans({ beans, role, onAdd, onRemove }) {
   
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>Beans</h1><p style={{ color: 'var(--text-muted)' }}>Manage your coffee profiles</p></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>Beans</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Manage your coffee profiles</p>
+        </div>
         {!locked && <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : '+ Add Bean'}</Button>}
       </div>
       
+      {locked && <Card style={{ marginBottom: 16 }}><div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Only managers and owners can add or remove beans.</div></Card>}
+      
       {showForm && !locked && <BeanForm onSave={onAdd} onClose={() => setShowForm(false)} />}
       
-      {beans.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No beans yet. Add your first bean!</div></Card> : (
+      {beans.length === 0 && !showForm ? (
+        <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No beans yet. Add your first bean!</div></Card>
+      ) : (
         <div className="grid grid-2">
           {beans.map(b => (
             <Card key={b.id}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                <div><div style={{ fontWeight: 600, fontSize: 16 }}>{b.name}</div>{b.origin && <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{b.origin}</div>}</div>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 16 }}>{b.name}</div>
+                  {b.origin && <div style={{ color: 'var(--text-muted)', fontSize: 13 }}>{b.origin}</div>}
+                  {b.roaster && <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>Roaster: {b.roaster}</div>}
+                </div>
                 {!locked && <button onClick={() => onRemove(b.id)} style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 18 }}>×</button>}
               </div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>{b.dose_target}g → {b.yield_target}g · {b.time_min}–{b.time_max}s</div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>Stock: {Number(b.stock_kg || 0).toFixed(1)}kg</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', marginTop: 8 }}>
+                {b.dose_target}g → {b.yield_target}g · {b.time_min}–{b.time_max}s
+              </div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', marginTop: 4 }}>
+                Stock: {Number(b.stock_kg || 0).toFixed(1)}kg
+                {b.cost_per_kg ? ` · $${b.cost_per_kg}/kg` : ''}
+              </div>
             </Card>
           ))}
         </div>
@@ -931,11 +1068,28 @@ function Beans({ beans, role, onAdd, onRemove }) {
 }
 
 function BeanForm({ onSave, onClose }) {
-  const [f, setF] = useState({ name: '', origin: '', roaster: '', roastDate: '', doseTarget: '18', yieldTarget: '36', timeMin: '25', timeMax: '32', stockKg: '', costPerKg: '', lowStockDays: '3' });
+  const [f, setF] = useState({
+    name: '', origin: '', roaster: '', roastDate: '',
+    doseTarget: '18', yieldTarget: '36', timeMin: '25', timeMax: '32',
+    stockKg: '', costPerKg: '', lowStockDays: '3'
+  });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  
   const save = async () => {
     if (!f.name.trim()) return;
-    await onSave({ name: f.name.trim(), origin: f.origin.trim(), roaster: f.roaster.trim(), roastDate: f.roastDate, doseTarget: Number(f.doseTarget), yieldTarget: Number(f.yieldTarget), timeMin: Number(f.timeMin), timeMax: Number(f.timeMax), stockKg: Number(f.stockKg) || 0, costPerKg: f.costPerKg ? Number(f.costPerKg) : '', lowStockDays: Number(f.lowStockDays) || 3 });
+    await onSave({
+      name: f.name.trim(),
+      origin: f.origin.trim(),
+      roaster: f.roaster.trim(),
+      roastDate: f.roastDate,
+      doseTarget: Number(f.doseTarget),
+      yieldTarget: Number(f.yieldTarget),
+      timeMin: Number(f.timeMin),
+      timeMax: Number(f.timeMax),
+      stockKg: Number(f.stockKg) || 0,
+      costPerKg: f.costPerKg ? Number(f.costPerKg) : '',
+      lowStockDays: Number(f.lowStockDays) || 3
+    });
     onClose();
   };
   
@@ -957,8 +1111,8 @@ function BeanForm({ onSave, onClose }) {
           <Input label="Time Max (s)" type="number" value={f.timeMax} onChange={set('timeMax')} />
         </div>
         <div className="grid grid-3">
-          <Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} />
-          <Input label="Cost/kg" type="number" step="0.01" value={f.costPerKg} onChange={set('costPerKg')} />
+          <Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} placeholder="0" />
+          <Input label="Cost/kg" type="number" step="0.01" value={f.costPerKg} onChange={set('costPerKg')} placeholder="optional" />
           <Input label="Low Stock (days)" type="number" value={f.lowStockDays} onChange={set('lowStockDays')} />
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
@@ -981,27 +1135,42 @@ function Inventory({ beans, shots, waste, role, currency, onDeliver }) {
     return { ...b, usage, rem, tone: stockTone(b, rem) };
   }), [beans, shots, waste]);
   
+  const totalValue = rows.reduce((a, r) => a + (Number(r.stock_kg || 0) * Number(r.cost_per_kg || 0)), 0);
+  
   return (
     <div>
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 4 }}>Inventory</h1>
-      <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Stock levels and usage</p>
+      <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>
+        Stock value: {currency} {totalValue.toFixed(2)}
+      </p>
       
-      {beans.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>Add beans first.</div></Card> : (
-        <div className="grid">
+      {locked && <Card style={{ marginBottom: 16 }}><div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Only managers and owners can record deliveries.</div></Card>}
+      
+      {beans.length === 0 ? (
+        <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>Add beans first.</div></Card>
+      ) : (
+        <div className="grid" style={{ marginBottom: 16 }}>
           {rows.map(r => (
             <Card key={r.id}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <div><div style={{ fontWeight: 600 }}>{r.name}</div><div style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{Number(r.stock_kg || 0).toFixed(1)}kg · ~{(r.usage * 1000).toFixed(0)}g/day</div></div>
+                <div>
+                  <div style={{ fontWeight: 600 }}>{r.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    {Number(r.stock_kg || 0).toFixed(1)}kg · ~{(r.usage * 1000).toFixed(0)}g/day
+                  </div>
+                </div>
                 <Badge tone={r.tone}>{r.rem === null ? 'No data' : `${r.rem.toFixed(1)} days`}</Badge>
               </div>
-              <div className="progress-bar"><div className="progress-fill" style={{ width: `${Math.min(100, r.rem === null ? 100 : (r.rem / 14) * 100)}%`, background: toneColor(r.tone) }} /></div>
+              <div className="progress-bar">
+                <div className="progress-fill" style={{ width: `${Math.min(100, r.rem === null ? 100 : (r.rem / 14) * 100)}%`, background: toneColor(r.tone) }} />
+              </div>
             </Card>
           ))}
         </div>
       )}
       
       {!locked && beans.length > 0 && (
-        <Card style={{ marginTop: 16 }}>
+        <Card>
           <h3 style={{ marginBottom: 12 }}>Record Delivery</h3>
           <DeliveryForm beans={beans} onSave={onDeliver} />
         </Card>
@@ -1015,15 +1184,22 @@ function DeliveryForm({ beans, onSave }) {
   const [kg, setKg] = useState('');
   const [cost, setCost] = useState('');
   const [supplier, setSupplier] = useState('');
-  const submit = async () => { if (!beanId || !kg) return; await onSave({ beanId, kg: Number(kg), costPerKg: cost ? Number(cost) : '', supplier: supplier.trim() }); setKg(''); setCost(''); setSupplier(''); };
+  
+  const submit = async () => {
+    if (!beanId || !kg) return;
+    await onSave({ beanId, kg: Number(kg), costPerKg: cost ? Number(cost) : '', supplier: supplier.trim() });
+    setKg(''); setCost(''); setSupplier('');
+  };
   
   return (
     <div className="grid">
-      <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
+      <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>
+        {beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+      </Select>
       <div className="grid grid-3">
-        <Input label="Kg" type="number" step="0.1" value={kg} onChange={e => setKg(e.target.value)} />
-        <Input label="Cost/kg" type="number" step="0.01" value={cost} onChange={e => setCost(e.target.value)} />
-        <Input label="Supplier" value={supplier} onChange={e => setSupplier(e.target.value)} />
+        <Input label="Kg" type="number" step="0.1" value={kg} onChange={e => setKg(e.target.value)} placeholder="5" />
+        <Input label="Cost/kg" type="number" step="0.01" value={cost} onChange={e => setCost(e.target.value)} placeholder="optional" />
+        <Input label="Supplier" value={supplier} onChange={e => setSupplier(e.target.value)} placeholder="optional" />
       </div>
       <Button onClick={submit} style={{ justifyContent: 'center' }}>Add Delivery</Button>
     </div>
@@ -1039,8 +1215,16 @@ function Waste({ beans, waste, onAdd }) {
   const [beanId, setBeanId] = useState(beans[0]?.id || '');
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState(WASTE_REASONS[0]);
-  const todayTotal = waste.filter(w => new Date(w.created_at).toDateString() === new Date().toDateString()).reduce((a, w) => a + Number(w.amount_g || 0), 0);
-  const save = async () => { if (!amount || !beanId) return; await onAdd({ beanId, amountG: Number(amount), reason }); setAmount(''); };
+  
+  const todayTotal = waste
+    .filter(w => new Date(w.created_at).toDateString() === new Date().toDateString())
+    .reduce((a, w) => a + Number(w.amount_g || 0), 0);
+  
+  const save = async () => {
+    if (!amount || !beanId) return;
+    await onAdd({ beanId, amountG: Number(amount), reason });
+    setAmount('');
+  };
   
   return (
     <div>
@@ -1049,21 +1233,30 @@ function Waste({ beans, waste, onAdd }) {
       
       <Card style={{ maxWidth: 500, marginBottom: 16 }}>
         <div className="grid">
-          <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
+          <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>
+            {beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+          </Select>
           <div className="grid grid-2">
-            <Input label="Amount (g)" type="number" value={amount} onChange={e => setAmount(e.target.value)} />
-            <Select label="Reason" value={reason} onChange={e => setReason(e.target.value)}>{WASTE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}</Select>
+            <Input label="Amount (g)" type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="18" />
+            <Select label="Reason" value={reason} onChange={e => setReason(e.target.value)}>
+              {WASTE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}
+            </Select>
           </div>
           <Button onClick={save} disabled={!beans.length} style={{ justifyContent: 'center' }}>Log Waste</Button>
         </div>
       </Card>
       
-      {waste.slice(0, 10).map(w => {
+      {waste.length === 0 ? (
+        <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No waste logged yet.</div></Card>
+      ) : waste.slice(0, 10).map(w => {
         const bean = beans.find(b => b.id === w.bean_id);
         return (
           <Card key={w.id} style={{ marginBottom: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div><div style={{ fontWeight: 500 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{w.reason} · {w.display_name}</div></div>
+              <div>
+                <div style={{ fontWeight: 500 }}>{bean?.name || 'Unknown'}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{w.reason} · {w.display_name} · {fmtDateTime(w.created_at)}</div>
+              </div>
               <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--warning)' }}>{w.amount_g}g</div>
             </div>
           </Card>
@@ -1088,13 +1281,19 @@ function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
     return { ...m, shotCount: mShots.length, wasteG, avgTime };
   }).sort((a, b) => b.shotCount - a.shotCount), [members, shots, waste]);
   
-  const copyCode = () => { navigator.clipboard?.writeText(workspace.invite_code); addToast('Invite code copied!', 'success'); };
+  const copyCode = () => {
+    navigator.clipboard?.writeText(workspace.invite_code);
+    addToast('Invite code copied!', 'success');
+  };
   
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>Team</h1><p style={{ color: 'var(--text-muted)' }}>Invite code: {workspace.invite_code}</p></div>
-        <Button variant="ghost" onClick={copyCode}>Copy Invite Code</Button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>Team</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Invite code: <strong style={{ color: 'var(--primary)' }}>{workspace.invite_code}</strong></p>
+        </div>
+        <Button variant="ghost" onClick={copyCode}>📋 Copy Invite Code</Button>
       </div>
       
       <div className="grid">
@@ -1102,17 +1301,26 @@ function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
           <Card key={s.user_id}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
               <Avatar name={s.display_name} color={s.avatar_color} size="lg" />
-              <div><div style={{ fontWeight: 600 }}>{s.display_name}{s.user_id === userId ? ' (you)' : ''}</div><Badge tone={s.role === 'owner' ? 'sage' : s.role === 'manager' ? 'amber' : 'muted'}>{roleLabel[s.role]}</Badge></div>
+              <div>
+                <div style={{ fontWeight: 600 }}>{s.display_name}{s.user_id === userId ? ' (you)' : ''}</div>
+                <Badge tone={s.role === 'owner' ? 'sage' : s.role === 'manager' ? 'amber' : 'muted'}>{roleLabel[s.role]}</Badge>
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 16, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)' }}>
-              <div>{s.shotCount} shots</div><div>avg {s.avgTime}s</div><div>{s.wasteG}g waste</div>
+            <div style={{ display: 'flex', gap: 16, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+              <div>{s.shotCount} shots</div>
+              <div>avg {s.avgTime}s</div>
+              <div>{s.wasteG}g waste</div>
             </div>
             {canManageTeam(role) && (
               <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                <Select value={s.role} onChange={e => onChangeRole(s.user_id, e.target.value)}>
-                  <option value="barista">Barista</option><option value="manager">Manager</option><option value="owner">Owner</option>
+                <Select value={s.role} onChange={e => onChangeRole(s.user_id, e.target.value)} style={{ flex: 1 }}>
+                  <option value="barista">Barista</option>
+                  <option value="manager">Manager</option>
+                  <option value="owner">Owner</option>
                 </Select>
-                {s.user_id !== userId && <Button variant="danger" size="sm" onClick={() => onRemove(s.user_id)}>Remove</Button>}
+                {s.user_id !== userId && (
+                  <Button variant="danger" size="sm" onClick={() => onRemove(s.user_id)}>Remove</Button>
+                )}
               </div>
             )}
           </Card>
@@ -1128,19 +1336,30 @@ function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
 function History({ shots, beans, onExport }) {
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>History</h1><p style={{ color: 'var(--text-muted)' }}>{shots.length} total shots</p></div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28 }}>History</h1>
+          <p style={{ color: 'var(--text-muted)' }}>{shots.length} total shots</p>
+        </div>
         {shots.length > 0 && <Button variant="ghost" size="sm" onClick={onExport}>📥 Export CSV</Button>}
       </div>
       
       <Card>
-        {shots.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shots yet.</div> : shots.map(s => {
+        {shots.length === 0 ? (
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shots yet.</div>
+        ) : shots.map(s => {
           const bean = beans.find(b => b.id === s.bean_id);
           const status = shotStatus(s, bean);
           return (
             <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
-              <div><div style={{ fontWeight: 500 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}</div></div>
-              <div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 12 }}><div>{s.dose}g:{s.yield}g · {s.time_s}s</div><Badge tone={status.tone}>{status.label}</Badge></div>
+              <div>
+                <div style={{ fontWeight: 500 }}>{bean?.name || 'Unknown'}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}</div>
+              </div>
+              <div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 12 }}>
+                <div>{s.dose}g:{s.yield}g · {s.time_s}s</div>
+                <Badge tone={status.tone}>{status.label}</Badge>
+              </div>
             </div>
           );
         })}
@@ -1154,12 +1373,38 @@ function History({ shots, beans, onExport }) {
 ============================================================ */
 function Settings({ workspace, role, onUpdate }) {
   const editable = canManageTeam(role);
+  const { addToast } = useToast();
+  
+  const clearLocalData = () => {
+    if (window.confirm('Clear all local data? This will log you out.')) {
+      localStorage.clear();
+      window.location.reload();
+    }
+  };
+  
   return (
     <div>
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 24 }}>Settings</h1>
-      <Card style={{ maxWidth: 400 }}>
+      
+      <Card style={{ maxWidth: 400, marginBottom: 16 }}>
         <label className="label">Currency</label>
-        {editable ? <Select value={workspace.currency} onChange={e => onUpdate({ currency: e.target.value })}>{CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}</Select> : <div>{workspace.currency}</div>}
+        {editable ? (
+          <Select value={workspace.currency} onChange={e => onUpdate({ currency: e.target.value })}>
+            {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </Select>
+        ) : (
+          <div>{workspace.currency}</div>
+        )}
+        {!editable && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>Only owners can change settings.</div>}
+      </Card>
+      
+      <Card style={{ maxWidth: 400 }}>
+        <label className="label">Workspace</label>
+        <div style={{ fontSize: 15, fontWeight: 500, marginBottom: 4 }}>{workspace.name}</div>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+          Invite code: {workspace.invite_code}
+        </div>
+        <Button variant="danger" size="sm" onClick={clearLocalData}>Clear Local Data</Button>
       </Card>
     </div>
   );
@@ -1169,10 +1414,44 @@ function Settings({ workspace, role, onUpdate }) {
    ROOT
 ============================================================ */
 function Root() {
-  return <ToastProvider><MainApp /></ToastProvider>;
+  return (
+    <ToastProvider>
+      <MainApp />
+    </ToastProvider>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
+</script>
+
+<!-- Service Worker for PWA -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    const swCode = `
+      self.addEventListener('install', function(e) {
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', function(e) {
+        e.waitUntil(clients.claim());
+      });
+      self.addEventListener('fetch', function(e) {
+        e.respondWith(
+          fetch(e.request).catch(function() {
+            return caches.match(e.request);
+          })
+        );
+      });
+    `;
+    
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    
+    navigator.serviceWorker.register(swUrl)
+      .then(function() { console.log('Service Worker registered'); })
+      .catch(function(err) { console.log('SW registration failed:', err); });
+  });
+}
 </script>
 </body>
 </html>
