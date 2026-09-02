@@ -6,144 +6,78 @@
 <title>Calibrate Pro — Espresso Intelligence Platform</title>
 <meta name="description" content="Track espresso shots, manage bean inventory, shifts, and analyze team performance." />
 <meta name="theme-color" content="#c4a572" />
-
-<!-- PWA Manifest -->
-<link rel="manifest" href='data:application/json,{"name":"Calibrate Pro","short_name":"Calibrate","description":"Espresso calibration and inventory management","start_url":".","display":"standalone","background_color":"#0f1115","theme_color":"#c4a572","icons":[{"src":"data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%23c4a572%27/><text x=%2750%27 y=%2765%27 font-size=%2750%27 text-anchor=%27middle%27>☕</text></svg>","sizes":"192x192","type":"image/svg+xml"}]}' />
-
-<!-- iOS PWA -->
-<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Calibrate Pro" />
+<link rel="manifest" href='data:application/json,{"name":"Calibrate Pro","short_name":"Calibrate","start_url":".","display":"standalone","background_color":"#0f1115","theme_color":"#c4a572"}' />
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c4a572'/><text x='50' y='65' font-size='50' text-anchor='middle'>☕</text></svg>" />
-
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <style>
-:root {
-  --bg: #0f1115;
-  --card: #1a1d23;
-  --card-hover: #22262e;
-  --border: #2a2e35;
-  --input-bg: #22262e;
-  --text: #f0ede8;
-  --text-muted: #8b9198;
-  --text-dim: #5a6068;
-  --primary: #c4a572;
-  --primary-hover: #d4b582;
-  --primary-dim: #c4a57222;
-  --success: #7fa66b;
-  --success-dim: #7fa66b22;
-  --warning: #d4a545;
-  --warning-dim: #d4a54522;
-  --danger: #c55a4a;
-  --danger-dim: #c55a4a22;
-  --info: #5b8fa8;
-  --info-dim: #5b8fa822;
-  --radius: 12px;
-  --radius-sm: 8px;
-  --shadow: 0 4px 12px rgba(0,0,0,0.3);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
-  --transition: all 0.2s ease;
-  --font-heading: 'Fraunces', serif;
-  --font-body: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--font-body);
-  font-size: 14px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  overscroll-behavior: none;
-}
-
-#root { min-height: 100vh; }
-
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-::selection { background: var(--primary-dim); color: var(--text); }
-
-input, select, textarea, button { font-family: inherit; font-size: inherit; }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-
-.fade-in { animation: fadeIn 0.3s ease-out; }
-.slide-in { animation: slideIn 0.3s ease-out; }
-
-.spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.6s linear infinite; }
-.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); animation: pulse 2s ease-in-out infinite; display: inline-block; }
-
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--radius-sm); border: none; cursor: pointer; font-weight: 500; font-size: 14px; transition: var(--transition); -webkit-tap-highlight-color: transparent; }
-.btn:active { transform: scale(0.97); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-primary { background: var(--primary); color: #14171a; }
-.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
-.btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger-dim); }
-.btn-sm { padding: 6px 12px; font-size: 12px; }
-
-.card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; transition: var(--transition); }
-.card-clickable { cursor: pointer; }
-.card-clickable:hover { background: var(--card-hover); }
-.card-clickable:active { transform: scale(0.98); }
-
-.input, .select, .textarea { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; color: var(--text); font-size: 14px; outline: none; transition: var(--transition); -webkit-appearance: none; }
-.input:focus, .select:focus, .textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-dim); }
-.textarea { resize: vertical; min-height: 60px; }
-
-.label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
-
-.badge { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; white-space: nowrap; }
-.badge-sage { color: var(--success); background: var(--success-dim); border: 1px solid var(--success); }
-.badge-rust { color: var(--danger); background: var(--danger-dim); border: 1px solid var(--danger); }
-.badge-amber { color: var(--warning); background: var(--warning-dim); border: 1px solid var(--warning); }
-.badge-steel { color: var(--info); background: var(--info-dim); border: 1px solid var(--info); }
-.badge-muted { color: var(--text-muted); background: transparent; border: 1px solid var(--border); }
-
-.grid { display: grid; gap: 16px; }
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-4 { grid-template-columns: repeat(4, 1fr); }
-
-@media (max-width: 768px) {
-  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-  .sidebar { display: none !important; }
-  .main-content { margin-left: 0 !important; padding: 16px !important; padding-bottom: 90px !important; }
-  .mobile-nav { display: flex !important; }
-}
-
-.toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-.toast { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; min-width: 280px; max-width: 400px; box-shadow: var(--shadow-lg); cursor: pointer; animation: slideIn 0.3s ease-out; }
-
-.sidebar { width: 230px; border-right: 1px solid var(--border); padding: 20px 14px; display: flex; flex-direction: column; gap: 2px; position: fixed; top: 0; left: 0; bottom: 0; background: var(--bg); z-index: 100; overflow-y: auto; }
-.sidebar-nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius-sm); cursor: pointer; color: var(--text-muted); transition: var(--transition); font-size: 13px; }
-.sidebar-nav-item:hover { background: var(--card-hover); color: var(--text); }
-.sidebar-nav-item.active { background: var(--primary-dim); color: var(--primary); }
-
-.main-content { margin-left: 230px; padding: 24px 28px; min-height: 100vh; }
-
-.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); padding: 6px 4px; z-index: 100; justify-content: space-around; overflow-x: auto; }
-
-.avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; color: #14171a; flex-shrink: 0; }
-.avatar-sm { width: 24px; height: 24px; font-size: 10px; }
-.avatar-lg { width: 44px; height: 44px; font-size: 14px; }
-
-.progress-bar { height: 6px; background: var(--input-bg); border-radius: 3px; overflow: hidden; }
-.progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease; }
-
-.offline-banner { position: fixed; top: 0; left: 0; right: 0; background: var(--warning); color: #14171a; text-align: center; padding: 6px; font-size: 12px; font-weight: 500; z-index: 10000; }
-.alert-card { border-color: var(--danger) !important; background: var(--danger-dim) !important; }
-.delete-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 4px 6px; border-radius: 4px; transition: var(--transition); }
-.delete-btn:hover { background: var(--danger-dim); }
+:root{--bg:#0f1115;--card:#1a1d23;--card-hover:#22262e;--border:#2a2e35;--input-bg:#22262e;--text:#f0ede8;--text-muted:#8b9198;--primary:#c4a572;--primary-hover:#d4b582;--primary-dim:#c4a57222;--success:#7fa66b;--success-dim:#7fa66b22;--warning:#d4a545;--warning-dim:#d4a54522;--danger:#c55a4a;--danger-dim:#c55a4a22;--info:#5b8fa8;--info-dim:#5b8fa822;--radius:12px;--radius-sm:8px;--shadow:0 4px 12px rgba(0,0,0,0.3);--shadow-lg:0 8px 24px rgba(0,0,0,0.4);--font-heading:'Fraunces',serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+#root{min-height:100vh}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+::selection{background:var(--primary-dim);color:var(--text)}
+input,select,textarea,button{font-family:inherit;font-size:inherit}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.fade-in{animation:fadeIn .3s ease-out}
+.slide-in{animation:slideIn .3s ease-out}
+.spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s ease-in-out infinite;display:inline-block}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-weight:500;font-size:14px;transition:all .2s ease;-webkit-tap-highlight-color:transparent}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-primary{background:var(--primary);color:#14171a}
+.btn-primary:hover:not(:disabled){background:var(--primary-hover)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:#3a3e45;background:var(--card-hover)}
+.btn-danger{background:transparent;color:var(--danger);border:1px solid var(--danger-dim)}
+.btn-danger:hover{background:var(--danger-dim)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all .2s ease}
+.card-clickable{cursor:pointer}
+.card-clickable:hover{background:var(--card-hover)}
+.card-clickable:active{transform:scale(.98)}
+.input,.select,.textarea{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:all .2s ease;-webkit-appearance:none}
+.input:focus,.select:focus,.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim)}
+.textarea{resize:vertical;min-height:60px}
+.label{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:4px 8px;border-radius:4px;white-space:nowrap}
+.badge-sage{color:var(--success);background:var(--success-dim);border:1px solid var(--success)}
+.badge-rust{color:var(--danger);background:var(--danger-dim);border:1px solid var(--danger)}
+.badge-amber{color:var(--warning);background:var(--warning-dim);border:1px solid var(--warning)}
+.badge-steel{color:var(--info);background:var(--info-dim);border:1px solid var(--info)}
+.badge-muted{color:var(--text-muted);background:transparent;border:1px solid var(--border)}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.sidebar{display:none!important}.main-content{margin-left:0!important;padding:16px!important;padding-bottom:90px!important}.mobile-nav{display:flex!important}}
+.toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;min-width:280px;max-width:400px;box-shadow:var(--shadow-lg);cursor:pointer;animation:slideIn .3s ease-out}
+.sidebar{width:230px;border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;gap:2px;position:fixed;top:0;left:0;bottom:0;background:var(--bg);z-index:100;overflow-y:auto}
+.sidebar-nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-muted);transition:all .2s ease;font-size:13px}
+.sidebar-nav-item:hover{background:var(--card-hover);color:var(--text)}
+.sidebar-nav-item.active{background:var(--primary-dim);color:var(--primary)}
+.main-content{margin-left:230px;padding:24px 28px;min-height:100vh}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:6px 4px;z-index:100;justify-content:space-around;overflow-x:auto}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#14171a;flex-shrink:0}
+.avatar-sm{width:24px;height:24px;font-size:10px}
+.avatar-lg{width:44px;height:44px;font-size:14px}
+.progress-bar{height:6px;background:var(--input-bg);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width .3s ease}
+.offline-banner{position:fixed;top:0;left:0;right:0;background:var(--warning);color:#14171a;text-align:center;padding:6px;font-size:12px;font-weight:500;z-index:10000}
+.alert-card{border-color:var(--danger)!important;background:var(--danger-dim)!important}
+.delete-btn{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:4px;transition:all .2s ease}
+.delete-btn:hover{background:var(--danger-dim)}
 </style>
 </head>
 <body>
@@ -156,14 +90,8 @@ input, select, textarea, button { font-family: inherit; font-size: inherit; }
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useMemo, useCallback, createContext, useContext } = React;
 
-/* ============================================================
-   CONFIGURATION
-============================================================ */
 const API_URL = "https://script.google.com/macros/s/AKfycbxHJ7tT61UEKYC7uTzt0RviNpwEWdOj4znyLO012B73I3zxSfrS2HRW2oJvoA43y2Kk/exec";
 
-/* ============================================================
-   API CLIENT
-============================================================ */
 function apiCall(action, payload = {}) {
   return new Promise((resolve, reject) => {
     const callbackName = 'cb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -210,9 +138,6 @@ const api = {
   getShifts: (workspaceId) => apiCall("getShifts", { workspaceId }),
 };
 
-/* ============================================================
-   CONSTANTS & HELPERS
-============================================================ */
 const CURRENCIES = ["AED", "USD", "EUR", "GBP", "SAR", "UGX", "KES", "INR"];
 const ROLE_RANK = { barista: 0, manager: 1, owner: 2 };
 const roleLabel = { owner: "Owner", manager: "Manager", barista: "Barista" };
@@ -258,9 +183,6 @@ function downloadCSV(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
-/* ============================================================
-   TOAST SYSTEM
-============================================================ */
 const ToastContext = createContext();
 function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -288,9 +210,6 @@ function ToastProvider({ children }) {
 }
 const useToast = () => useContext(ToastContext);
 
-/* ============================================================
-   UI COMPONENTS
-============================================================ */
 function Button({ children, variant = 'primary', size = '', style, ...props }) {
   return <button className={`btn btn-${variant} ${size ? 'btn-' + size : ''}`} style={style} {...props}>{children}</button>;
 }
@@ -316,9 +235,6 @@ function LoadingScreen() {
   return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ textAlign: 'center' }}><div className="spinner" style={{ width: 40, height: 40, borderWidth: 3 }} /><div style={{ marginTop: 12, color: 'var(--text-muted)' }}>Loading...</div></div></div>;
 }
 
-/* ============================================================
-   AUTH SCREEN
-============================================================ */
 function AuthScreen({ onAuthed }) {
   const [mode, setMode] = useState('signup');
   const [showForgot, setShowForgot] = useState(false);
@@ -384,9 +300,7 @@ function AuthScreen({ onAuthed }) {
           <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 30, fontWeight: 600 }}>Calibrate Pro</h1>
           <p style={{ color: 'var(--text-muted)', marginTop: 4 }}>Dial in every shot. Track everything.</p>
         </div>
-        
         {message && <div style={{ background: 'var(--success-dim)', color: 'var(--success)', padding: 12, borderRadius: 8, marginBottom: 12, fontSize: 13 }}>{message}</div>}
-        
         {showReset ? (
           <Card>
             <h3 style={{ marginBottom: 14 }}>Reset Password</h3>
@@ -430,9 +344,6 @@ function AuthScreen({ onAuthed }) {
   );
 }
 
-/* ============================================================
-   WORKSPACE PICKER
-============================================================ */
 function WorkspacePicker({ onSelect }) {
   const [workspaces, setWorkspaces] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
@@ -441,13 +352,8 @@ function WorkspacePicker({ onSelect }) {
   const [code, setCode] = useState('');
   const [busy, setBusy] = useState(false);
   const { addToast } = useToast();
-  
-  const load = useCallback(async () => {
-    try { setWorkspaces(await api.getWorkspaces()); }
-    catch (e) { addToast(e.message, 'error'); }
-  }, [addToast]);
+  const load = useCallback(async () => { try { setWorkspaces(await api.getWorkspaces()); } catch (e) { addToast(e.message, 'error'); } }, [addToast]);
   useEffect(() => { load(); }, [load]);
-  
   if (!workspaces) return <LoadingScreen />;
   
   return (
@@ -455,61 +361,38 @@ function WorkspacePicker({ onSelect }) {
       <div style={{ maxWidth: 560, margin: '0 auto' }}>
         <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 28, marginBottom: 4 }}>Your Workspaces</h1>
         <p style={{ color: 'var(--text-muted)', marginBottom: 22 }}>Pick a café, create a new one, or join with a code.</p>
-        
         <div className="grid" style={{ marginBottom: 18 }}>
           {workspaces.map(w => (
             <Card key={w.workspace.id} className="card-clickable" onClick={() => onSelect(w.workspace, w.role)}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: 16 }}>{w.workspace.name}</div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 2 }}>{roleLabel[w.role]}{w.workspace.is_personal ? ' · Personal' : ''}</div>
-                </div>
+                <div><div style={{ fontWeight: 600, fontSize: 16 }}>{w.workspace.name}</div><div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 2 }}>{roleLabel[w.role]}{w.workspace.is_personal ? ' · Personal' : ''}</div></div>
                 <span style={{ color: 'var(--text-muted)', fontSize: 18 }}>→</span>
               </div>
             </Card>
           ))}
         </div>
-        
         <div style={{ display: 'flex', gap: 10, marginBottom: 14 }}>
           <Button variant="ghost" onClick={() => { setShowCreate(!showCreate); setShowJoin(false); }} style={{ flex: 1, justifyContent: 'center' }}>+ Create Café</Button>
           <Button variant="ghost" onClick={() => { setShowJoin(!showJoin); setShowCreate(false); }} style={{ flex: 1, justifyContent: 'center' }}>Join with Code</Button>
         </div>
-        
         {showCreate && (
           <Card style={{ marginBottom: 12 }}>
             <Input label="Café Name" value={name} onChange={e => setName(e.target.value)} placeholder="Kaori Café" />
-            <Button onClick={async () => {
-              if (!name.trim()) return;
-              setBusy(true);
-              try { await api.createWorkspace(name.trim()); addToast('Workspace created!', 'success'); setName(''); setShowCreate(false); await load(); }
-              catch (e) { addToast(e.message, 'error'); }
-              setBusy(false);
-            }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Creating...' : 'Create'}</Button>
+            <Button onClick={async () => { if (!name.trim()) return; setBusy(true); try { await api.createWorkspace(name.trim()); addToast('Workspace created!', 'success'); setName(''); setShowCreate(false); await load(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Creating...' : 'Create'}</Button>
           </Card>
         )}
-        
         {showJoin && (
           <Card>
             <Input label="Invite Code" value={code} onChange={e => setCode(e.target.value)} placeholder="ABC123" />
-            <Button onClick={async () => {
-              if (!code.trim()) return;
-              setBusy(true);
-              try { await api.joinWorkspace(code.trim()); addToast('Joined!', 'success'); setCode(''); setShowJoin(false); await load(); }
-              catch (e) { addToast(e.message, 'error'); }
-              setBusy(false);
-            }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Joining...' : 'Join'}</Button>
+            <Button onClick={async () => { if (!code.trim()) return; setBusy(true); try { await api.joinWorkspace(code.trim()); addToast('Joined!', 'success'); setCode(''); setShowJoin(false); await load(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Joining...' : 'Join'}</Button>
           </Card>
         )}
-        
         <div onClick={() => { api.logout(); window.location.reload(); }} style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', marginTop: 20 }}>Sign Out</div>
       </div>
     </div>
   );
 }
 
-/* ============================================================
-   MAIN APP
-============================================================ */
 function MainApp() {
   const [user, setUser] = useState(undefined);
   const [workspace, setWorkspace] = useState(null);
@@ -568,14 +451,8 @@ function MainApp() {
   
   const exportData = () => {
     const rows = [["Type", "Bean", "User", "Dose", "Yield", "Time", "Rating", "Notes", "Date"]];
-    data.shots.forEach(s => {
-      const bean = data.beans.find(b => b.id === s.bean_id);
-      rows.push(["Shot", bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || "", s.created_at]);
-    });
-    data.waste.forEach(w => {
-      const bean = data.beans.find(b => b.id === w.bean_id);
-      rows.push(["Waste", bean?.name || "", w.display_name || "", "", "", "", "", w.reason, w.created_at]);
-    });
+    data.shots.forEach(s => { const bean = data.beans.find(b => b.id === s.bean_id); rows.push(["Shot", bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || "", s.created_at]); });
+    data.waste.forEach(w => { const bean = data.beans.find(b => b.id === w.bean_id); rows.push(["Waste", bean?.name || "", w.display_name || "", "", "", "", "", w.reason, w.created_at]); });
     downloadCSV(`calibrate_export_${new Date().toISOString().split('T')[0]}.csv`, rows);
     addToast('Data exported!', 'success');
   };
@@ -613,8 +490,7 @@ function MainApp() {
       <div className="mobile-nav">
         {NAV.map(item => (
           <div key={item.id} onClick={() => setTab(item.id)} style={{ color: tab === item.id ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', fontSize: 9, padding: '2px 4px', minWidth: 44 }}>
-            <div style={{ fontSize: 16 }}>{item.icon}</div>
-            <div>{item.label}</div>
+            <div style={{ fontSize: 16 }}>{item.icon}</div><div>{item.label}</div>
           </div>
         ))}
       </div>
@@ -624,32 +500,27 @@ function MainApp() {
         {tab === 'log' && <LogShot beans={data.beans} onSave={async (shot) => { await api.addShot(workspace.id, shot); addToast('Shot logged!', 'success'); refresh(); }} />}
         {tab === 'shifts' && <Shifts workspace={workspace} userId={user.id} />}
         {tab === 'beans' && <Beans beans={data.beans} role={role} onAdd={async (bean) => { await api.addBean(workspace.id, bean); addToast('Bean added!', 'success'); refresh(); }} onRemove={async (id) => { if (window.confirm('Remove this bean?')) { await api.removeBean(workspace.id, id); addToast('Bean removed', 'success'); refresh(); } }} />}
-        {tab === 'inventory' && <Inventory beans={data.beans} shots={data.shots} waste={data.waste} deliveries={data.deliveries} role={role} currency={workspace.currency} onDeliver={async (d) => { await api.addDelivery(workspace.id, d); addToast('Delivery recorded!', 'success'); refresh(); }} onDeleteDelivery={async (id) => { if (window.confirm('Delete this delivery? Stock will be adjusted.')) { await api.deleteDelivery(workspace.id, id); addToast('Delivery deleted', 'success'); refresh(); } }} />}
-        {tab === 'waste' && <Waste beans={data.beans} waste={data.waste} onAdd={async (w) => { await api.addWaste(workspace.id, w); addToast('Waste logged!', 'success'); refresh(); }} onDelete={async (id) => { if (window.confirm('Delete this waste entry? Stock will be restored.')) { await api.deleteWaste(workspace.id, id); addToast('Waste deleted', 'success'); refresh(); } }} />}
+        {tab === 'inventory' && <Inventory beans={data.beans} shots={data.shots} waste={data.waste} deliveries={data.deliveries} role={role} currency={workspace.currency} onDeliver={async (d) => { await api.addDelivery(workspace.id, d); addToast('Delivery recorded!', 'success'); refresh(); }} onDeleteDelivery={async (id) => { if (window.confirm('Delete this delivery?')) { await api.deleteDelivery(workspace.id, id); addToast('Delivery deleted', 'success'); refresh(); } }} />}
+        {tab === 'waste' && <Waste beans={data.beans} waste={data.waste} onAdd={async (w) => { await api.addWaste(workspace.id, w); addToast('Waste logged!', 'success'); refresh(); }} onDelete={async (id) => { if (window.confirm('Delete this waste entry?')) { await api.deleteWaste(workspace.id, id); addToast('Waste deleted', 'success'); refresh(); } }} />}
         {tab === 'team' && <Team data={data} workspace={workspace} role={role} userId={user.id} onChangeRole={async (uid, r) => { await api.changeRole(workspace.id, uid, r); addToast('Role updated!', 'success'); refresh(); }} onRemove={async (uid) => { if (window.confirm('Remove this member?')) { await api.removeMember(workspace.id, uid); addToast('Member removed', 'success'); refresh(); } }} />}
-        {tab === 'history' && <History shots={data.shots} beans={data.beans} onDelete={async (id) => { if (window.confirm('Delete this shot? Stock will be restored.')) { await api.deleteShot(workspace.id, id); addToast('Shot deleted', 'success'); refresh(); } }} onExport={() => { const rows = [["Date", "Bean", "Barista", "Dose", "Yield", "Time", "Rating", "Notes"]]; data.shots.forEach(s => { const bean = data.beans.find(b => b.id === s.bean_id); rows.push([s.created_at, bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || ""]); }); downloadCSV('shot_history.csv', rows); addToast('History exported!', 'success'); }} />}
+        {tab === 'history' && <History shots={data.shots} beans={data.beans} onDelete={async (id) => { if (window.confirm('Delete this shot?')) { await api.deleteShot(workspace.id, id); addToast('Shot deleted', 'success'); refresh(); } }} onExport={() => { const rows = [["Date", "Bean", "Barista", "Dose", "Yield", "Time", "Rating", "Notes"]]; data.shots.forEach(s => { const bean = data.beans.find(b => b.id === s.bean_id); rows.push([s.created_at, bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || ""]); }); downloadCSV('shot_history.csv', rows); addToast('History exported!', 'success'); }} />}
         {tab === 'settings' && <Settings workspace={workspace} role={role} onUpdate={async (fields) => { await api.updateWorkspace(workspace.id, fields); setWorkspace(w => ({ ...w, ...fields })); addToast('Settings updated!', 'success'); }} />}
       </div>
     </div>
   );
 }
 
-/* ============================================================
-   DASHBOARD
-============================================================ */
 function Dashboard({ data, workspace, onExport }) {
   const { beans, shots, waste } = data;
   const today = new Date().toDateString();
   const shotsToday = shots.filter(s => new Date(s.created_at).toDateString() === today).length;
   const wasteToday = waste.filter(w => new Date(w.created_at).toDateString() === today).reduce((a, w) => a + Number(w.amount_g || 0), 0);
-  
   const onTargetPct = useMemo(() => {
     const withBean = shots.filter(s => beans.find(b => b.id === s.bean_id));
     if (!withBean.length) return null;
     const optimal = withBean.filter(s => shotStatus(s, beans.find(b => b.id === s.bean_id)).tone === 'sage');
     return Math.round((optimal.length / withBean.length) * 100);
   }, [shots, beans]);
-  
   const lowStockBeans = useMemo(() => beans.filter(b => {
     const usage = dailyUsageKg(b.id, shots, waste);
     const remaining = daysRemaining(b, usage);
@@ -669,7 +540,6 @@ function Dashboard({ data, workspace, onExport }) {
         <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>Dashboard</h1><p style={{ color: 'var(--text-muted)' }}>{workspace.name}</p></div>
         <Button variant="ghost" size="sm" onClick={onExport}>📥 Export</Button>
       </div>
-      
       {lowStockBeans.length > 0 && (
         <Card className="alert-card" style={{ marginBottom: 14 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -678,7 +548,6 @@ function Dashboard({ data, workspace, onExport }) {
           </div>
         </Card>
       )}
-      
       <div className="grid grid-4">
         {stats.map(s => (
           <Card key={s.label}>
@@ -688,7 +557,6 @@ function Dashboard({ data, workspace, onExport }) {
           </Card>
         ))}
       </div>
-      
       <Card style={{ marginTop: 14 }}>
         <h3 style={{ marginBottom: 12 }}>Recent Activity</h3>
         {shots.length === 0 ? (
@@ -704,10 +572,7 @@ function Dashboard({ data, workspace, onExport }) {
             <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Avatar name={s.display_name} color={s.avatar_color} size="sm" />
-                <div>
-                  <div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.dose}g → {s.yield}g in {s.time_s}s · {fmtTime(s.created_at)}</div>
-                </div>
+                <div><div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{s.dose}g → {s.yield}g in {s.time_s}s · {fmtTime(s.created_at)}</div></div>
               </div>
               <Badge tone={status.tone}>{status.label}</Badge>
             </div>
@@ -718,101 +583,76 @@ function Dashboard({ data, workspace, onExport }) {
   );
 }
 
-/* ============================================================
-   SHIFTS
-============================================================ */
 function Shifts({ workspace, userId }) {
   const [shifts, setShifts] = useState([]);
-  const [activeShift, setActiveShift] = useState(null);
-  const [notes, setNotes] = useState('');
+  const [myActiveShift, setMyActiveShift] = useState(null);
   const [busy, setBusy] = useState(false);
   const { addToast } = useToast();
   
-  const loadShifts = useCallback(async () => {
+  const loadShifts = async () => {
     try {
       const data = await api.getShifts(workspace.id);
       setShifts(data);
-      setActiveShift(data.find(s => !s.shift_end && String(s.user_id) === String(userId)));
+      const active = data.find(s => String(s.user_id) === String(userId) && (!s.shift_end || String(s.shift_end) === "" || String(s.shift_end) === "ACTIVE"));
+      setMyActiveShift(active || null);
     } catch (e) { addToast(e.message, 'error'); }
-  }, [workspace.id, userId, addToast]);
+  };
   
-  useEffect(() => { loadShifts(); }, [loadShifts]);
+  useEffect(() => { loadShifts(); }, [workspace.id, userId]);
   
   const startShift = async () => {
     setBusy(true);
-    try {
-      await api.startShift(workspace.id, notes.trim());
-      addToast('Shift started!', 'success');
-      setNotes('');
-      loadShifts();
-    } catch (e) { addToast(e.message, 'error'); }
+    try { await api.startShift(workspace.id, ""); addToast('Shift started!', 'success'); await loadShifts(); }
+    catch (e) { addToast(e.message, 'error'); }
     setBusy(false);
   };
   
   const endShift = async () => {
-    if (!window.confirm('End your shift now?')) return;
     setBusy(true);
-    try {
-      await api.endShift(workspace.id);
-      addToast('Shift ended!', 'success');
-      loadShifts();
-    } catch (e) { addToast(e.message, 'error'); }
+    try { await api.endShift(workspace.id); addToast('Shift ended!', 'success'); await loadShifts(); }
+    catch (e) { addToast(e.message, 'error'); }
     setBusy(false);
   };
   
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
-        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>Shifts</h1><p style={{ color: 'var(--text-muted)' }}>Track who worked when</p></div>
-        {!activeShift ? (
-          <Button onClick={startShift} disabled={busy}>Start Shift</Button>
+        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>Shifts</h1><p style={{ color: 'var(--text-muted)' }}>{myActiveShift ? '🟢 You are on shift' : '⚪ Not on shift'}</p></div>
+        {myActiveShift ? (
+          <Button variant="danger" onClick={endShift} disabled={busy} style={{ fontSize: 14, padding: '10px 20px' }}>{busy ? 'Ending...' : '🔴 End Shift'}</Button>
         ) : (
-          <Button variant="danger" onClick={endShift} disabled={busy}>End Shift</Button>
+          <Button onClick={startShift} disabled={busy} style={{ fontSize: 14, padding: '10px 20px' }}>{busy ? 'Starting...' : '🟢 Start Shift'}</Button>
         )}
       </div>
-      
-      {activeShift && (
-        <Card className="alert-card" style={{ marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      {myActiveShift && (
+        <Card style={{ marginBottom: 14, borderColor: 'var(--success)', background: 'var(--success-dim)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <span className="live-dot" />
-            <div><strong>Active Shift</strong><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Started at {fmtTime(activeShift.shift_start)}</div></div>
+            <div><strong>Currently Working</strong><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Started at {fmtTime(myActiveShift.shift_start)} · {fmtDate(myActiveShift.shift_start)}</div></div>
           </div>
         </Card>
       )}
-      
-      {!activeShift && (
-        <Card style={{ marginBottom: 14 }}>
-          <Input label="Shift Notes (optional)" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Opening shift, busy day expected..." />
-        </Card>
-      )}
-      
       <Card>
-        <h3 style={{ marginBottom: 12 }}>Shift History</h3>
+        <h3 style={{ marginBottom: 12 }}>All Shifts</h3>
         {shifts.length === 0 ? (
           <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shifts recorded yet.</div>
-        ) : shifts.slice(0, 20).map(s => (
-          <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Avatar name={s.display_name} color={s.avatar_color} size="sm" />
-              <div>
-                <div style={{ fontWeight: 500, fontSize: 13 }}>{s.display_name}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
-                  {fmtDate(s.shift_start)} · {fmtTime(s.shift_start)} → {s.shift_end ? fmtTime(s.shift_end) : 'Active'}
-                  {s.notes ? ` · ${s.notes}` : ''}
-                </div>
+        ) : shifts.slice(0, 20).map(s => {
+          const isActive = !s.shift_end || String(s.shift_end) === "" || String(s.shift_end) === "ACTIVE";
+          return (
+            <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Avatar name={s.display_name} color={s.avatar_color} size="sm" />
+                <div><div style={{ fontWeight: 500, fontSize: 13 }}>{s.display_name}{String(s.user_id) === String(userId) ? ' (you)' : ''}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDate(s.shift_start)} · {fmtTime(s.shift_start)} → {isActive ? 'Active' : fmtTime(s.shift_end)}</div></div>
               </div>
+              <Badge tone={isActive ? 'sage' : 'muted'}>{isActive ? 'Active' : 'Done'}</Badge>
             </div>
-            <Badge tone={s.shift_end ? 'muted' : 'sage'}>{s.shift_end ? 'Done' : 'Active'}</Badge>
-          </div>
-        ))}
+          );
+        })}
       </Card>
     </div>
   );
 }
 
-/* ============================================================
-   LOG SHOT
-============================================================ */
 function LogShot({ beans, onSave }) {
   const [beanId, setBeanId] = useState(beans[0]?.id || '');
   const [dose, setDose] = useState(beans[0]?.dose_target || '');
@@ -822,10 +662,8 @@ function LogShot({ beans, onSave }) {
   const [notes, setNotes] = useState('');
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
-  
   const ratio = dose && yieldG ? (Number(yieldG) / Number(dose)).toFixed(2) : null;
   const canSave = beanId && dose && yieldG && time;
-  
   const save = async () => {
     if (!canSave) return;
     setBusy(true);
@@ -833,25 +671,14 @@ function LogShot({ beans, onSave }) {
     setSaved(true); setDose(''); setYieldG(''); setTime(''); setNotes(''); setRating(3); setBusy(false);
     setTimeout(() => setSaved(false), 1800);
   };
-  
-  if (beans.length === 0) {
-    return <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 14 }}>Log Shot</h1><Card><div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Add a bean profile first.</div></Card></div>;
-  }
-  
+  if (beans.length === 0) return <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 14 }}>Log Shot</h1><Card><div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Add a bean profile first.</div></Card></div>;
   return (
     <div>
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 4 }}>Log Shot</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: 20 }}>Record your extraction details</p>
-      
       <Card style={{ maxWidth: 560 }}>
         <div className="grid">
-          <Select label="Bean" value={beanId} onChange={e => {
-            setBeanId(e.target.value);
-            const b = beans.find(x => x.id === e.target.value);
-            if (b) { setDose(b.dose_target || ''); setYieldG(b.yield_target || ''); }
-          }}>
-            {beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-          </Select>
+          <Select label="Bean" value={beanId} onChange={e => { setBeanId(e.target.value); const b = beans.find(x => x.id === e.target.value); if (b) { setDose(b.dose_target || ''); setYieldG(b.yield_target || ''); } }}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
           <div className="grid grid-3">
             <Input label="Dose (g)" type="number" step="0.1" value={dose} onChange={e => setDose(e.target.value)} placeholder="18" />
             <Input label="Yield (g)" type="number" step="0.1" value={yieldG} onChange={e => setYieldG(e.target.value)} placeholder="36" />
@@ -874,23 +701,17 @@ function LogShot({ beans, onSave }) {
   );
 }
 
-/* ============================================================
-   BEANS
-============================================================ */
 function Beans({ beans, role, onAdd, onRemove }) {
   const [showForm, setShowForm] = useState(false);
   const locked = !canManageBeans(role);
-  
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
         <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>Beans</h1><p style={{ color: 'var(--text-muted)' }}>Manage coffee profiles</p></div>
         {!locked && <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : '+ Add Bean'}</Button>}
       </div>
-      
       {locked && <Card style={{ marginBottom: 14 }}><div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Only managers and owners can manage beans.</div></Card>}
       {showForm && !locked && <BeanForm onSave={onAdd} onClose={() => setShowForm(false)} />}
-      
       {beans.length === 0 && !showForm ? (
         <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No beans yet.</div></Card>
       ) : (
@@ -914,12 +735,7 @@ function Beans({ beans, role, onAdd, onRemove }) {
 function BeanForm({ onSave, onClose }) {
   const [f, setF] = useState({ name: '', origin: '', roaster: '', roastDate: '', doseTarget: '18', yieldTarget: '36', timeMin: '25', timeMax: '32', stockKg: '', costPerKg: '', lowStockDays: '3' });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
-  const save = async () => {
-    if (!f.name.trim()) return;
-    await onSave({ name: f.name.trim(), origin: f.origin.trim(), roaster: f.roaster.trim(), roastDate: f.roastDate, doseTarget: Number(f.doseTarget), yieldTarget: Number(f.yieldTarget), timeMin: Number(f.timeMin), timeMax: Number(f.timeMax), stockKg: Number(f.stockKg) || 0, costPerKg: f.costPerKg ? Number(f.costPerKg) : '', lowStockDays: Number(f.lowStockDays) || 3 });
-    onClose();
-  };
-  
+  const save = async () => { if (!f.name.trim()) return; await onSave({ name: f.name.trim(), origin: f.origin.trim(), roaster: f.roaster.trim(), roastDate: f.roastDate, doseTarget: Number(f.doseTarget), yieldTarget: Number(f.yieldTarget), timeMin: Number(f.timeMin), timeMax: Number(f.timeMax), stockKg: Number(f.stockKg) || 0, costPerKg: f.costPerKg ? Number(f.costPerKg) : '', lowStockDays: Number(f.lowStockDays) || 3 }); onClose(); };
   return (
     <Card style={{ marginBottom: 14 }}>
       <div className="grid">
@@ -951,25 +767,14 @@ function BeanForm({ onSave, onClose }) {
   );
 }
 
-/* ============================================================
-   INVENTORY
-============================================================ */
 function Inventory({ beans, shots, waste, deliveries, role, currency, onDeliver, onDeleteDelivery }) {
   const locked = !canManageBeans(role);
-  const rows = useMemo(() => beans.map(b => {
-    const usage = dailyUsageKg(b.id, shots, waste);
-    const rem = daysRemaining(b, usage);
-    return { ...b, usage, rem, tone: stockTone(b, rem) };
-  }), [beans, shots, waste]);
-  
+  const rows = useMemo(() => beans.map(b => { const usage = dailyUsageKg(b.id, shots, waste); const rem = daysRemaining(b, usage); return { ...b, usage, rem, tone: stockTone(b, rem) }; }), [beans, shots, waste]);
   return (
     <div>
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 4 }}>Inventory</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: 20 }}>Stock levels and usage</p>
-      
-      {beans.length === 0 ? (
-        <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>Add beans first.</div></Card>
-      ) : (
+      {beans.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>Add beans first.</div></Card> : (
         <div className="grid" style={{ marginBottom: 14 }}>
           {rows.map(r => (
             <Card key={r.id}>
@@ -982,14 +787,7 @@ function Inventory({ beans, shots, waste, deliveries, role, currency, onDeliver,
           ))}
         </div>
       )}
-      
-      {!locked && beans.length > 0 && (
-        <Card style={{ marginBottom: 14 }}>
-          <h3 style={{ marginBottom: 10 }}>Record Delivery</h3>
-          <DeliveryForm beans={beans} onSave={onDeliver} />
-        </Card>
-      )}
-      
+      {!locked && beans.length > 0 && <Card style={{ marginBottom: 14 }}><h3 style={{ marginBottom: 10 }}>Record Delivery</h3><DeliveryForm beans={beans} onSave={onDeliver} /></Card>}
       {deliveries.length > 0 && (
         <Card>
           <h3 style={{ marginBottom: 10 }}>Recent Deliveries</h3>
@@ -1017,7 +815,6 @@ function DeliveryForm({ beans, onSave }) {
   const [cost, setCost] = useState('');
   const [supplier, setSupplier] = useState('');
   const submit = async () => { if (!beanId || !kg) return; await onSave({ beanId, kg: Number(kg), costPerKg: cost ? Number(cost) : '', supplier: supplier.trim() }); setKg(''); setCost(''); setSupplier(''); };
-  
   return (
     <div className="grid">
       <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
@@ -1031,23 +828,17 @@ function DeliveryForm({ beans, onSave }) {
   );
 }
 
-/* ============================================================
-   WASTE
-============================================================ */
 const WASTE_REASONS = ["Dial-in", "Channeling", "Wrong grind", "Order changed", "Dropped", "Other"];
-
 function Waste({ beans, waste, onAdd, onDelete }) {
   const [beanId, setBeanId] = useState(beans[0]?.id || '');
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState(WASTE_REASONS[0]);
   const todayTotal = waste.filter(w => new Date(w.created_at).toDateString() === new Date().toDateString()).reduce((a, w) => a + Number(w.amount_g || 0), 0);
   const save = async () => { if (!amount || !beanId) return; await onAdd({ beanId, amountG: Number(amount), reason }); setAmount(''); };
-  
   return (
     <div>
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 4 }}>Waste</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: 20 }}>{todayTotal}g logged today</p>
-      
       <Card style={{ maxWidth: 480, marginBottom: 14 }}>
         <div className="grid">
           <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
@@ -1058,18 +849,12 @@ function Waste({ beans, waste, onAdd, onDelete }) {
           <Button onClick={save} disabled={!beans.length} style={{ justifyContent: 'center' }}>Log Waste</Button>
         </div>
       </Card>
-      
-      {waste.length === 0 ? (
-        <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No waste logged yet.</div></Card>
-      ) : waste.slice(0, 15).map(w => {
+      {waste.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No waste logged yet.</div></Card> : waste.slice(0, 15).map(w => {
         const bean = beans.find(b => b.id === w.bean_id);
         return (
           <Card key={w.id} style={{ marginBottom: 6, padding: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{w.reason} · {w.display_name} · {fmtDateTime(w.created_at)}</div>
-              </div>
+              <div><div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{w.reason} · {w.display_name} · {fmtDateTime(w.created_at)}</div></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--warning)', fontSize: 13 }}>{w.amount_g}g</span>
                 <button className="delete-btn" onClick={() => onDelete(w.id)}>🗑️</button>
@@ -1082,9 +867,6 @@ function Waste({ beans, waste, onAdd, onDelete }) {
   );
 }
 
-/* ============================================================
-   TEAM
-============================================================ */
 function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
   const { members, shots, waste } = data;
   const { addToast } = useToast();
@@ -1095,16 +877,13 @@ function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
     const avgTime = mShots.length ? (mShots.reduce((a, s) => a + Number(s.time_s), 0) / mShots.length).toFixed(1) : '0';
     return { ...m, shotCount: mShots.length, wasteG, avgTime };
   }).sort((a, b) => b.shotCount - a.shotCount), [members, shots, waste]);
-  
   const copyCode = () => { navigator.clipboard?.writeText(workspace.invite_code); addToast('Invite code copied!', 'success'); };
-  
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
         <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>Team</h1><p style={{ color: 'var(--text-muted)' }}>Invite code: <strong style={{ color: 'var(--primary)' }}>{workspace.invite_code}</strong></p></div>
         <Button variant="ghost" onClick={copyCode}>📋 Copy Code</Button>
       </div>
-      
       <div className="grid">
         {stats.map(s => (
           <Card key={s.user_id}>
@@ -1130,9 +909,6 @@ function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
   );
 }
 
-/* ============================================================
-   HISTORY
-============================================================ */
 function History({ shots, beans, onDelete, onExport }) {
   return (
     <div>
@@ -1140,24 +916,15 @@ function History({ shots, beans, onDelete, onExport }) {
         <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>History</h1><p style={{ color: 'var(--text-muted)' }}>{shots.length} total shots</p></div>
         {shots.length > 0 && <Button variant="ghost" size="sm" onClick={onExport}>📥 Export CSV</Button>}
       </div>
-      
       <Card>
-        {shots.length === 0 ? (
-          <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shots yet.</div>
-        ) : shots.slice(0, 50).map(s => {
+        {shots.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shots yet.</div> : shots.slice(0, 50).map(s => {
           const bean = beans.find(b => b.id === s.bean_id);
           const status = shotStatus(s, bean);
           return (
             <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-              <div>
-                <div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div>
-                <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}</div>
-              </div>
+              <div><div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}</div></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 11 }}>
-                  <div>{s.dose}g:{s.yield}g · {s.time_s}s</div>
-                  <Badge tone={status.tone}>{status.label}</Badge>
-                </div>
+                <div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 11 }}><div>{s.dose}g:{s.yield}g · {s.time_s}s</div><Badge tone={status.tone}>{status.label}</Badge></div>
                 <button className="delete-btn" onClick={() => onDelete(s.id)} title="Delete shot">🗑️</button>
               </div>
             </div>
@@ -1168,33 +935,20 @@ function History({ shots, beans, onDelete, onExport }) {
   );
 }
 
-/* ============================================================
-   SETTINGS
-============================================================ */
 function Settings({ workspace, role, onUpdate }) {
   const editable = canManageTeam(role);
-  
   return (
     <div>
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 20 }}>Settings</h1>
       <Card style={{ maxWidth: 400 }}>
         <label className="label">Currency</label>
-        {editable ? (
-          <Select value={workspace.currency} onChange={e => onUpdate({ currency: e.target.value })}>
-            {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
-          </Select>
-        ) : (
-          <div>{workspace.currency}</div>
-        )}
+        {editable ? <Select value={workspace.currency} onChange={e => onUpdate({ currency: e.target.value })}>{CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}</Select> : <div>{workspace.currency}</div>}
         {!editable && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>Only owners can change settings.</div>}
       </Card>
     </div>
   );
 }
 
-/* ============================================================
-   ROOT
-============================================================ */
 function Root() {
   return <ToastProvider><MainApp /></ToastProvider>;
 }
