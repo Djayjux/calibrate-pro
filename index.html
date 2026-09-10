@@ -15,9 +15,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <style>
-:root{--bg:#0f1115;--card:#1a1d23;--card-hover:#22262e;--border:#2a2e35;--input-bg:#22262e;--text:#f0ede8;--text-muted:#8b9198;--primary:#c4a572;--primary-hover:#d4b582;--primary-dim:#c4a57222;--success:#7fa66b;--success-dim:#7fa66b22;--warning:#d4a545;--warning-dim:#d4a54522;--danger:#c55a4a;--danger-dim:#c55a4a22;--info:#5b8fa8;--info-dim:#5b8fa822;--radius:12px;--radius-sm:8px;--shadow:0 4px 12px rgba(0,0,0,0.3);--shadow-lg:0 8px 24px rgba(0,0,0,0.4);--font-heading:'Fraunces',serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace}
+:root{--bg:#0f1115;--card:#1a1d23;--card-hover:#22262e;--border:#2a2e35;--input-bg:#22262e;--text:#f0ede8;--text-muted:#8b9198;--primary:#c4a572;--primary-hover:#d4b582;--primary-dim:#c4a57222;--success:#7fa66b;--success-dim:#7fa66b22;--warning:#d4a545;--warning-dim:#d4a54522;--danger:#c55a4a;--danger-dim:#c55a4a22;--info:#5b8fa8;--info-dim:#5b8fa822;--radius:12px;--radius-sm:8px;--shadow-lg:0 8px 24px rgba(0,0,0,0.4);--font-heading:'Fraunces',serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 #root{min-height:100vh}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -27,9 +27,8 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .fade-in{animation:fadeIn .3s ease-out}
-.slide-in{animation:slideIn .3s ease-out}
 .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
 .live-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s ease-in-out infinite;display:inline-block}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-weight:500;font-size:14px;transition:all .2s ease;-webkit-tap-highlight-color:transparent}
@@ -45,7 +44,6 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:all .2s ease}
 .card-clickable{cursor:pointer}
 .card-clickable:hover{background:var(--card-hover)}
-.card-clickable:active{transform:scale(.98)}
 .input,.select,.textarea{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:all .2s ease;-webkit-appearance:none}
 .input:focus,.select:focus,.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim)}
 .textarea{resize:vertical;min-height:60px}
@@ -79,6 +77,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 .alert-card{border-color:var(--danger)!important;background:var(--danger-dim)!important}
 .delete-btn{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:4px;transition:all .2s ease}
 .delete-btn:hover{background:var(--danger-dim)}
+.search-bar{margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -117,6 +116,8 @@ const api = {
   login: (email, password) => apiCall("login", { email, password }).then(d => { localStorage.setItem("calibrate_token", d.token); return d; }),
   logout: () => localStorage.removeItem("calibrate_token"),
   me: () => apiCall("me"),
+  updateProfile: (displayName, avatarColor) => apiCall("updateProfile", { displayName, avatarColor }),
+  changePassword: (oldPassword, newPassword) => apiCall("changePassword", { oldPassword, newPassword }),
   getWorkspaces: () => apiCall("getWorkspaces"),
   createWorkspace: (name) => apiCall("createWorkspace", { name }),
   joinWorkspace: (code) => apiCall("joinWorkspace", { code }),
@@ -147,6 +148,7 @@ const ROLE_RANK = { barista: 0, manager: 1, owner: 2 };
 const roleLabel = { owner: "Owner", manager: "Manager", barista: "Barista" };
 const canManageBeans = (role) => ROLE_RANK[role] >= 1;
 const canManageTeam = (role) => role === "owner";
+const canSeeCost = (role) => role === "owner" || role === "manager";
 
 const fmtDate = (iso) => new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
@@ -187,7 +189,6 @@ function downloadCSV(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
-/* TOAST WITH UNDO SUPPORT */
 const ToastContext = createContext();
 function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -205,11 +206,7 @@ function ToastProvider({ children }) {
           <div key={toast.id} className="toast" onClick={() => { if (!toast.action) removeToast(toast.id); }}>
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: toast.type === 'success' ? 'var(--success)' : toast.type === 'error' ? 'var(--danger)' : 'var(--warning)', flexShrink: 0 }} />
             <div style={{ flex: 1 }}>{toast.message}</div>
-            {toast.action && (
-              <button className="toast-undo" onClick={(e) => { e.stopPropagation(); toast.action.onClick(); removeToast(toast.id); }}>
-                {toast.action.label || 'Undo'}
-              </button>
-            )}
+            {toast.action && <button className="toast-undo" onClick={(e) => { e.stopPropagation(); toast.action.onClick(); removeToast(toast.id); }}>{toast.action.label || 'Undo'}</button>}
           </div>
         ))}
       </div>
@@ -218,30 +215,14 @@ function ToastProvider({ children }) {
 }
 const useToast = () => useContext(ToastContext);
 
-function Button({ children, variant = 'primary', size = '', style, ...props }) {
-  return <button className={`btn btn-${variant} ${size ? 'btn-' + size : ''}`} style={style} {...props}>{children}</button>;
-}
-function Card({ children, className = '', ...props }) {
-  return <div className={`card ${className}`} {...props}>{children}</div>;
-}
-function Input({ label, ...props }) {
-  return <div>{label && <label className="label">{label}</label>}<input className="input" {...props} /></div>;
-}
-function Select({ label, children, ...props }) {
-  return <div>{label && <label className="label">{label}</label>}<select className="select" {...props}>{children}</select></div>;
-}
-function Textarea({ label, ...props }) {
-  return <div>{label && <label className="label">{label}</label>}<textarea className="textarea" {...props} /></div>;
-}
-function Badge({ children, tone = 'muted' }) {
-  return <span className={`badge badge-${tone}`}>{children}</span>;
-}
-function Avatar({ name, color, size = '' }) {
-  return <div className={`avatar avatar-${size}`} style={{ background: color || 'var(--primary)' }}>{(name || '?').charAt(0).toUpperCase()}</div>;
-}
-function LoadingScreen() {
-  return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ textAlign: 'center' }}><div className="spinner" style={{ width: 40, height: 40, borderWidth: 3 }} /><div style={{ marginTop: 12, color: 'var(--text-muted)' }}>Loading...</div></div></div>;
-}
+function Button({ children, variant = 'primary', size = '', style, ...props }) { return <button className={`btn btn-${variant} ${size ? 'btn-' + size : ''}`} style={style} {...props}>{children}</button>; }
+function Card({ children, className = '', ...props }) { return <div className={`card ${className}`} {...props}>{children}</div>; }
+function Input({ label, ...props }) { return <div>{label && <label className="label">{label}</label>}<input className="input" {...props} /></div>; }
+function Select({ label, children, ...props }) { return <div>{label && <label className="label">{label}</label>}<select className="select" {...props}>{children}</select>; }
+function Textarea({ label, ...props }) { return <div>{label && <label className="label">{label}</label>}<textarea className="textarea" {...props} /></div>; }
+function Badge({ children, tone = 'muted' }) { return <span className={`badge badge-${tone}`}>{children}</span>; }
+function Avatar({ name, color, size = '' }) { return <div className={`avatar avatar-${size}`} style={{ background: color || 'var(--primary)' }}>{(name || '?').charAt(0).toUpperCase()}</div>; }
+function LoadingScreen() { return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ textAlign: 'center' }}><div className="spinner" style={{ width: 40, height: 40, borderWidth: 3 }} /><div style={{ marginTop: 12, color: 'var(--text-muted)' }}>Loading...</div></div></div>; }
 
 function AuthScreen({ onAuthed }) {
   const [mode, setMode] = useState('signup');
@@ -363,7 +344,6 @@ function WorkspacePicker({ onSelect }) {
   const load = useCallback(async () => { try { setWorkspaces(await api.getWorkspaces()); } catch (e) { addToast(e.message, 'error'); } }, [addToast]);
   useEffect(() => { load(); }, [load]);
   if (!workspaces) return <LoadingScreen />;
-  
   return (
     <div style={{ minHeight: '100vh', padding: '40px 20px' }}>
       <div style={{ maxWidth: 560, margin: '0 auto' }}>
@@ -383,18 +363,8 @@ function WorkspacePicker({ onSelect }) {
           <Button variant="ghost" onClick={() => { setShowCreate(!showCreate); setShowJoin(false); }} style={{ flex: 1, justifyContent: 'center' }}>+ Create Café</Button>
           <Button variant="ghost" onClick={() => { setShowJoin(!showJoin); setShowCreate(false); }} style={{ flex: 1, justifyContent: 'center' }}>Join with Code</Button>
         </div>
-        {showCreate && (
-          <Card style={{ marginBottom: 12 }}>
-            <Input label="Café Name" value={name} onChange={e => setName(e.target.value)} placeholder="Kaori Café" />
-            <Button onClick={async () => { if (!name.trim()) return; setBusy(true); try { await api.createWorkspace(name.trim()); addToast('Workspace created!', 'success'); setName(''); setShowCreate(false); await load(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Creating...' : 'Create'}</Button>
-          </Card>
-        )}
-        {showJoin && (
-          <Card>
-            <Input label="Invite Code" value={code} onChange={e => setCode(e.target.value)} placeholder="ABC123" />
-            <Button onClick={async () => { if (!code.trim()) return; setBusy(true); try { await api.joinWorkspace(code.trim()); addToast('Joined!', 'success'); setCode(''); setShowJoin(false); await load(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Joining...' : 'Join'}</Button>
-          </Card>
-        )}
+        {showCreate && <Card style={{ marginBottom: 12 }}><Input label="Café Name" value={name} onChange={e => setName(e.target.value)} placeholder="Kaori Café" /><Button onClick={async () => { if (!name.trim()) return; setBusy(true); try { await api.createWorkspace(name.trim()); addToast('Workspace created!', 'success'); setName(''); setShowCreate(false); await load(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Creating...' : 'Create'}</Button></Card>}
+        {showJoin && <Card><Input label="Invite Code" value={code} onChange={e => setCode(e.target.value)} placeholder="ABC123" /><Button onClick={async () => { if (!code.trim()) return; setBusy(true); try { await api.joinWorkspace(code.trim()); addToast('Joined!', 'success'); setCode(''); setShowJoin(false); await load(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); }} disabled={busy} style={{ justifyContent: 'center', width: '100%', marginTop: 10 }}>{busy ? 'Joining...' : 'Join'}</Button></Card>}
         <div onClick={() => { api.logout(); window.location.reload(); }} style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, cursor: 'pointer', marginTop: 20 }}>Sign Out</div>
       </div>
     </div>
@@ -405,6 +375,7 @@ function MainApp() {
   const [user, setUser] = useState(undefined);
   const [workspace, setWorkspace] = useState(null);
   const [role, setRole] = useState(null);
+  const [canSeeCost, setCanSeeCost] = useState(false);
   const [tab, setTab] = useState('dashboard');
   const [data, setData] = useState({ beans: [], shots: [], waste: [], deliveries: [], members: [] });
   const [loading, setLoading] = useState(false);
@@ -433,6 +404,7 @@ function MainApp() {
     try {
       const d = await api.getWorkspaceData(wsId);
       setData({ beans: d.beans || [], shots: d.shots || [], waste: d.waste || [], deliveries: d.deliveries || [], members: d.members || [] });
+      setCanSeeCost(d.canSeeCost || false);
     } catch (e) { addToast(e.message, 'error'); }
     finally { setLoading(false); }
   }, [addToast]);
@@ -452,6 +424,7 @@ function MainApp() {
     { id: 'waste', label: 'Waste', icon: '🗑️' },
     { id: 'team', label: 'Team', icon: '👥' },
     { id: 'history', label: 'History', icon: '📜' },
+    { id: 'profile', label: 'Profile', icon: '👤' },
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ];
   
@@ -504,21 +477,22 @@ function MainApp() {
       </div>
       
       <div className="main-content">
-        {tab === 'dashboard' && <Dashboard data={data} workspace={workspace} onExport={exportData} />}
+        {tab === 'dashboard' && <Dashboard data={data} workspace={workspace} onExport={exportData} canSeeCost={canSeeCost} />}
         {tab === 'log' && <LogShot beans={data.beans} onSave={async (shot) => { await api.addShot(workspace.id, shot); addToast('Shot logged!', 'success'); refresh(); }} />}
         {tab === 'shifts' && <Shifts workspace={workspace} userId={user.id} />}
-        {tab === 'beans' && <Beans beans={data.beans} role={role} onAdd={async (bean) => { await api.addBean(workspace.id, bean); addToast('Bean added!', 'success'); refresh(); }} onRemove={async (id) => { if (window.confirm('Remove this bean?')) { await api.removeBean(workspace.id, id); addToast('Bean removed', 'success'); refresh(); } }} />}
-        {tab === 'inventory' && <Inventory beans={data.beans} shots={data.shots} waste={data.waste} deliveries={data.deliveries} role={role} currency={workspace.currency} onDeliver={async (d) => { await api.addDelivery(workspace.id, d); addToast('Delivery recorded!', 'success'); refresh(); }} onDeleteDelivery={async (id) => { const result = await api.deleteDelivery(workspace.id, id); refresh(); addToast('Delivery deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreDelivery(workspace.id, result.deletedDelivery); refresh(); } }); }} />}
+        {tab === 'beans' && <Beans beans={data.beans} role={role} canSeeCost={canSeeCost} onAdd={async (bean) => { await api.addBean(workspace.id, bean); addToast('Bean added!', 'success'); refresh(); }} onRemove={async (id) => { if (window.confirm('Remove this bean?')) { await api.removeBean(workspace.id, id); addToast('Bean removed', 'success'); refresh(); } }} />}
+        {tab === 'inventory' && <Inventory beans={data.beans} shots={data.shots} waste={data.waste} deliveries={data.deliveries} role={role} canSeeCost={canSeeCost} currency={workspace.currency} onDeliver={async (d) => { await api.addDelivery(workspace.id, d); addToast('Delivery recorded!', 'success'); refresh(); }} onDeleteDelivery={async (id) => { const result = await api.deleteDelivery(workspace.id, id); refresh(); addToast('Delivery deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreDelivery(workspace.id, result.deletedDelivery); refresh(); } }); }} />}
         {tab === 'waste' && <Waste beans={data.beans} waste={data.waste} onAdd={async (w) => { await api.addWaste(workspace.id, w); addToast('Waste logged!', 'success'); refresh(); }} onDelete={async (id) => { const result = await api.deleteWaste(workspace.id, id); refresh(); addToast('Waste deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreWaste(workspace.id, result.deletedWaste); refresh(); } }); }} />}
         {tab === 'team' && <Team data={data} workspace={workspace} role={role} userId={user.id} onChangeRole={async (uid, r) => { await api.changeRole(workspace.id, uid, r); addToast('Role updated!', 'success'); refresh(); }} onRemove={async (uid) => { if (window.confirm('Remove this member?')) { await api.removeMember(workspace.id, uid); addToast('Member removed', 'success'); refresh(); } }} />}
         {tab === 'history' && <History shots={data.shots} beans={data.beans} onDelete={async (id) => { const result = await api.deleteShot(workspace.id, id); refresh(); addToast('Shot deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreShot(workspace.id, result.deletedShot); refresh(); } }); }} onExport={() => { const rows = [["Date", "Bean", "Barista", "Dose", "Yield", "Time", "Rating", "Notes"]]; data.shots.forEach(s => { const bean = data.beans.find(b => b.id === s.bean_id); rows.push([s.created_at, bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || ""]); }); downloadCSV('shot_history.csv', rows); addToast('History exported!', 'success'); }} />}
+        {tab === 'profile' && <Profile user={user} onUpdate={(u) => setUser(u)} />}
         {tab === 'settings' && <Settings workspace={workspace} role={role} onUpdate={async (fields) => { await api.updateWorkspace(workspace.id, fields); setWorkspace(w => ({ ...w, ...fields })); addToast('Settings updated!', 'success'); }} />}
       </div>
     </div>
   );
 }
 
-function Dashboard({ data, workspace, onExport }) {
+function Dashboard({ data, workspace, onExport, canSeeCost }) {
   const { beans, shots, waste } = data;
   const today = new Date().toDateString();
   const shotsToday = shots.filter(s => new Date(s.created_at).toDateString() === today).length;
@@ -546,9 +520,7 @@ function Dashboard({ data, workspace, onExport }) {
       </div>
       {lowStockBeans.length > 0 && <Card className="alert-card" style={{ marginBottom: 14 }}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ fontSize: 20 }}>⚠️</span><div><div style={{ fontWeight: 600, color: 'var(--danger)' }}>Low Stock!</div><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{lowStockBeans.map(b => b.name).join(', ')}</div></div></div></Card>}
       <div className="grid grid-4">
-        {stats.map(s => (
-          <Card key={s.label}><div style={{ fontSize: 22 }}>{s.icon}</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, margin: '4px 0', color: s.color }}>{s.value}</div><div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{s.label}</div></Card>
-        ))}
+        {stats.map(s => (<Card key={s.label}><div style={{ fontSize: 22 }}>{s.icon}</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 24, fontWeight: 600, margin: '4px 0', color: s.color }}>{s.value}</div><div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em' }}>{s.label}</div></Card>))}
       </div>
       <Card style={{ marginTop: 14 }}>
         <h3 style={{ marginBottom: 12 }}>Recent Activity</h3>
@@ -563,20 +535,10 @@ function Shifts({ workspace, userId }) {
   const [myActiveShift, setMyActiveShift] = useState(null);
   const [busy, setBusy] = useState(false);
   const { addToast } = useToast();
-  
-  const loadShifts = async () => {
-    try {
-      const data = await api.getShifts(workspace.id);
-      setShifts(data);
-      const active = data.find(s => String(s.user_id) === String(userId) && (!s.shift_end || String(s.shift_end) === "" || String(s.shift_end) === "ACTIVE"));
-      setMyActiveShift(active || null);
-    } catch (e) { addToast(e.message, 'error'); }
-  };
+  const loadShifts = async () => { try { const data = await api.getShifts(workspace.id); setShifts(data); const active = data.find(s => String(s.user_id) === String(userId) && (!s.shift_end || String(s.shift_end) === "" || String(s.shift_end) === "ACTIVE")); setMyActiveShift(active || null); } catch (e) { addToast(e.message, 'error'); } };
   useEffect(() => { loadShifts(); }, [workspace.id, userId]);
-  
   const startShift = async () => { setBusy(true); try { await api.startShift(workspace.id, ""); addToast('Shift started!', 'success'); await loadShifts(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); };
   const endShift = async () => { setBusy(true); try { await api.endShift(workspace.id); addToast('Shift ended!', 'success'); await loadShifts(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); };
-  
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
@@ -627,7 +589,7 @@ function LogShot({ beans, onSave }) {
   );
 }
 
-function Beans({ beans, role, onAdd, onRemove }) {
+function Beans({ beans, role, canSeeCost, onAdd, onRemove }) {
   const [showForm, setShowForm] = useState(false);
   const locked = !canManageBeans(role);
   return (
@@ -637,13 +599,13 @@ function Beans({ beans, role, onAdd, onRemove }) {
         {!locked && <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : '+ Add Bean'}</Button>}
       </div>
       {locked && <Card style={{ marginBottom: 14 }}><div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Only managers and owners can manage beans.</div></Card>}
-      {showForm && !locked && <BeanForm onSave={onAdd} onClose={() => setShowForm(false)} />}
-      {beans.length === 0 && !showForm ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No beans yet.</div></Card> : (<div className="grid grid-2">{beans.map(b => (<Card key={b.id}><div style={{ display: 'flex', justifyContent: 'space-between' }}><div><div style={{ fontWeight: 600 }}>{b.name}</div>{b.origin && <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{b.origin}</div>}</div>{!locked && <button className="delete-btn" onClick={() => onRemove(b.id)}>×</button>}</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>{b.dose_target}g → {b.yield_target}g · {b.time_min}–{b.time_max}s</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>Stock: {Number(b.stock_kg || 0).toFixed(1)}kg</div></Card>))}</div>)}
+      {showForm && !locked && <BeanForm onSave={onAdd} onClose={() => setShowForm(false)} canSeeCost={canSeeCost} />}
+      {beans.length === 0 && !showForm ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No beans yet.</div></Card> : (<div className="grid grid-2">{beans.map(b => (<Card key={b.id}><div style={{ display: 'flex', justifyContent: 'space-between' }}><div><div style={{ fontWeight: 600 }}>{b.name}</div>{b.origin && <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{b.origin}</div>}</div>{!locked && <button className="delete-btn" onClick={() => onRemove(b.id)}>×</button>}</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>{b.dose_target}g → {b.yield_target}g · {b.time_min}–{b.time_max}s</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>Stock: {Number(b.stock_kg || 0).toFixed(1)}kg{canSeeCost && b.cost_per_kg ? ` · $${b.cost_per_kg}/kg` : ''}</div></Card>))}</div>)}
     </div>
   );
 }
 
-function BeanForm({ onSave, onClose }) {
+function BeanForm({ onSave, onClose, canSeeCost }) {
   const [f, setF] = useState({ name: '', origin: '', roaster: '', roastDate: '', doseTarget: '18', yieldTarget: '36', timeMin: '25', timeMax: '32', stockKg: '', costPerKg: '', lowStockDays: '3' });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
   const save = async () => { if (!f.name.trim()) return; await onSave({ name: f.name.trim(), origin: f.origin.trim(), roaster: f.roaster.trim(), roastDate: f.roastDate, doseTarget: Number(f.doseTarget), yieldTarget: Number(f.yieldTarget), timeMin: Number(f.timeMin), timeMax: Number(f.timeMax), stockKg: Number(f.stockKg) || 0, costPerKg: f.costPerKg ? Number(f.costPerKg) : '', lowStockDays: Number(f.lowStockDays) || 3 }); onClose(); };
@@ -655,14 +617,26 @@ function BeanForm({ onSave, onClose }) {
         <Input label="Roast Date" type="date" value={f.roastDate} onChange={set('roastDate')} />
         <div className="grid grid-2"><Input label="Dose (g)" type="number" value={f.doseTarget} onChange={set('doseTarget')} /><Input label="Yield (g)" type="number" value={f.yieldTarget} onChange={set('yieldTarget')} /></div>
         <div className="grid grid-2"><Input label="Time Min (s)" type="number" value={f.timeMin} onChange={set('timeMin')} /><Input label="Time Max (s)" type="number" value={f.timeMax} onChange={set('timeMax')} /></div>
-        <div className="grid grid-3"><Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} /><Input label="Cost/kg" type="number" step="0.01" value={f.costPerKg} onChange={set('costPerKg')} /><Input label="Low (days)" type="number" value={f.lowStockDays} onChange={set('lowStockDays')} /></div>
+        {canSeeCost && (
+          <div className="grid grid-3">
+            <Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} />
+            <Input label="Cost/kg" type="number" step="0.01" value={f.costPerKg} onChange={set('costPerKg')} />
+            <Input label="Low (days)" type="number" value={f.lowStockDays} onChange={set('lowStockDays')} />
+          </div>
+        )}
+        {!canSeeCost && (
+          <div className="grid grid-2">
+            <Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} />
+            <Input label="Low (days)" type="number" value={f.lowStockDays} onChange={set('lowStockDays')} />
+          </div>
+        )}
         <div style={{ display: 'flex', gap: 8 }}><Button onClick={save} style={{ flex: 1, justifyContent: 'center' }}>Save Bean</Button><Button variant="ghost" onClick={onClose}>Cancel</Button></div>
       </div>
     </Card>
   );
 }
 
-function Inventory({ beans, shots, waste, deliveries, role, currency, onDeliver, onDeleteDelivery }) {
+function Inventory({ beans, shots, waste, deliveries, role, canSeeCost, currency, onDeliver, onDeleteDelivery }) {
   const locked = !canManageBeans(role);
   const rows = useMemo(() => beans.map(b => { const usage = dailyUsageKg(b.id, shots, waste); const rem = daysRemaining(b, usage); return { ...b, usage, rem, tone: stockTone(b, rem) }; }), [beans, shots, waste]);
   return (
@@ -670,13 +644,13 @@ function Inventory({ beans, shots, waste, deliveries, role, currency, onDeliver,
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 4 }}>Inventory</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: 20 }}>Stock levels and usage</p>
       {beans.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>Add beans first.</div></Card> : (<div className="grid" style={{ marginBottom: 14 }}>{rows.map(r => (<Card key={r.id}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}><div><div style={{ fontWeight: 600 }}>{r.name}</div><div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{Number(r.stock_kg || 0).toFixed(1)}kg · ~{(r.usage * 1000).toFixed(0)}g/day</div></div><Badge tone={r.tone}>{r.rem === null ? 'No data' : `${r.rem.toFixed(1)} days`}</Badge></div><div className="progress-bar"><div className="progress-fill" style={{ width: `${Math.min(100, r.rem === null ? 100 : (r.rem / 14) * 100)}%`, background: toneColor(r.tone) }} /></div></Card>))}</div>)}
-      {!locked && beans.length > 0 && <Card style={{ marginBottom: 14 }}><h3 style={{ marginBottom: 10 }}>Record Delivery</h3><DeliveryForm beans={beans} onSave={onDeliver} /></Card>}
+      {!locked && beans.length > 0 && <Card style={{ marginBottom: 14 }}><h3 style={{ marginBottom: 10 }}>Record Delivery</h3><DeliveryForm beans={beans} onSave={onDeliver} canSeeCost={canSeeCost} /></Card>}
       {deliveries.length > 0 && (<Card><h3 style={{ marginBottom: 10 }}>Recent Deliveries</h3>{deliveries.slice(0, 10).map(d => { const bean = beans.find(b => b.id === d.bean_id); return (<div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)', fontSize: 12 }}><div>{bean?.name || '—'} · {d.display_name} · {fmtDate(d.created_at)}</div><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: 'var(--success)', fontFamily: 'var(--font-mono)' }}>+{d.kg}kg</span>{!locked && <button className="delete-btn" onClick={() => onDeleteDelivery(d.id)}>🗑️</button>}</div></div>); })}</Card>)}
     </div>
   );
 }
 
-function DeliveryForm({ beans, onSave }) {
+function DeliveryForm({ beans, onSave, canSeeCost }) {
   const [beanId, setBeanId] = useState(beans[0]?.id || '');
   const [kg, setKg] = useState('');
   const [cost, setCost] = useState('');
@@ -685,7 +659,11 @@ function DeliveryForm({ beans, onSave }) {
   return (
     <div className="grid">
       <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
-      <div className="grid grid-3"><Input label="Kg" type="number" step="0.1" value={kg} onChange={e => setKg(e.target.value)} placeholder="5" /><Input label="Cost/kg" type="number" step="0.01" value={cost} onChange={e => setCost(e.target.value)} placeholder="optional" /><Input label="Supplier" value={supplier} onChange={e => setSupplier(e.target.value)} placeholder="optional" /></div>
+      <div className="grid grid-3">
+        <Input label="Kg" type="number" step="0.1" value={kg} onChange={e => setKg(e.target.value)} placeholder="5" />
+        {canSeeCost && <Input label="Cost/kg" type="number" step="0.01" value={cost} onChange={e => setCost(e.target.value)} placeholder="optional" />}
+        <Input label="Supplier" value={supplier} onChange={e => setSupplier(e.target.value)} placeholder="optional" />
+      </div>
       <Button onClick={submit} style={{ justifyContent: 'center' }}>Add Delivery</Button>
     </div>
   );
@@ -739,14 +717,108 @@ function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
 }
 
 function History({ shots, beans, onDelete, onExport }) {
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('all');
+  const filtered = useMemo(() => {
+    let list = shots;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(s => {
+        const bean = beans.find(b => b.id === s.bean_id);
+        return (bean?.name || '').toLowerCase().includes(q) || (s.display_name || '').toLowerCase().includes(q) || (s.notes || '').toLowerCase().includes(q);
+      });
+    }
+    if (filter === 'today') list = list.filter(s => new Date(s.created_at).toDateString() === new Date().toDateString());
+    if (filter === 'week') list = list.filter(s => Date.now() - new Date(s.created_at).getTime() < 7 * 86400000);
+    if (filter === 'optimal') list = list.filter(s => { const bean = beans.find(b => b.id === s.bean_id); return shotStatus(s, bean).tone === 'sage'; });
+    if (filter === 'issues') list = list.filter(s => { const bean = beans.find(b => b.id === s.bean_id); return shotStatus(s, bean).tone !== 'sage'; });
+    return list;
+  }, [shots, beans, search, filter]);
+  
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
-        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>History</h1><p style={{ color: 'var(--text-muted)' }}>{shots.length} total shots</p></div>
+        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>History</h1><p style={{ color: 'var(--text-muted)' }}>{filtered.length} of {shots.length} shots</p></div>
         {shots.length > 0 && <Button variant="ghost" size="sm" onClick={onExport}>📥 Export CSV</Button>}
       </div>
+      <div className="search-bar">
+        <Input placeholder="🔍 Search by bean, barista, or notes..." value={search} onChange={e => setSearch(e.target.value)} />
+      </div>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
+        {[{ id: 'all', label: 'All' }, { id: 'today', label: 'Today' }, { id: 'week', label: 'Last 7 days' }, { id: 'optimal', label: '✓ Optimal' }, { id: 'issues', label: '⚠ Issues' }].map(f => (
+          <button key={f.id} onClick={() => setFilter(f.id)} className={`btn ${filter === f.id ? 'btn-primary' : 'btn-ghost'} btn-sm`}>{f.label}</button>
+        ))}
+      </div>
       <Card>
-        {shots.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shots yet.</div> : shots.slice(0, 50).map(s => { const bean = beans.find(b => b.id === s.bean_id); const status = shotStatus(s, bean); return (<div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}><div><div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}</div></div><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 11 }}><div>{s.dose}g:{s.yield}g · {s.time_s}s</div><Badge tone={status.tone}>{status.label}</Badge></div><button className="delete-btn" onClick={() => onDelete(s.id)} title="Delete shot">🗑️</button></div></div>); })}
+        {filtered.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>{shots.length === 0 ? 'No shots yet.' : 'No shots match your filter.'}</div> : filtered.slice(0, 100).map(s => { const bean = beans.find(b => b.id === s.bean_id); const status = shotStatus(s, bean); return (<div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}><div><div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}{s.notes ? ` · ${s.notes}` : ''}</div></div><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 11 }}><div>{s.dose}g:{s.yield}g · {s.time_s}s</div><Badge tone={status.tone}>{status.label}</Badge></div><button className="delete-btn" onClick={() => onDelete(s.id)} title="Delete shot">🗑️</button></div></div>); })}
+      </Card>
+    </div>
+  );
+}
+
+function Profile({ user, onUpdate }) {
+  const [displayName, setDisplayName] = useState(user.display_name);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const { addToast } = useToast();
+  
+  const colors = ["#c4a572", "#7fa66b", "#5b8fa8", "#c55a4a", "#8b6fa8", "#5ba88a"];
+  const [avatarColor, setAvatarColor] = useState(user.avatar_color);
+  
+  const saveProfile = async () => {
+    setBusy(true);
+    try {
+      const result = await api.updateProfile(displayName, avatarColor);
+      addToast('Profile updated!', 'success');
+      onUpdate(result.user);
+    } catch (e) { addToast(e.message, 'error'); }
+    setBusy(false);
+  };
+  
+  const changePassword = async () => {
+    if (!oldPassword || !newPassword) { addToast('Fill both password fields', 'error'); return; }
+    if (newPassword.length < 6) { addToast('New password must be at least 6 characters', 'error'); return; }
+    setBusy(true);
+    try {
+      await api.changePassword(oldPassword, newPassword);
+      addToast('Password changed!', 'success');
+      setOldPassword(''); setNewPassword('');
+    } catch (e) { addToast(e.message, 'error'); }
+    setBusy(false);
+  };
+  
+  return (
+    <div>
+      <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 20 }}>Profile</h1>
+      
+      <Card style={{ maxWidth: 500, marginBottom: 14 }}>
+        <h3 style={{ marginBottom: 14 }}>Personal Info</h3>
+        <div className="grid">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <Avatar name={displayName} color={avatarColor} size="lg" />
+            <div style={{ flex: 1 }}>
+              <label className="label">Avatar Color</label>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {colors.map(c => (
+                  <div key={c} onClick={() => setAvatarColor(c)} style={{ width: 28, height: 28, borderRadius: '50%', background: c, cursor: 'pointer', border: avatarColor === c ? '2px solid var(--text)' : '2px solid transparent' }} />
+                ))}
+              </div>
+            </div>
+          </div>
+          <Input label="Display Name" value={displayName} onChange={e => setDisplayName(e.target.value)} />
+          <Input label="Email (cannot change)" value={user.email} disabled style={{ opacity: 0.6 }} />
+          <Button onClick={saveProfile} disabled={busy} style={{ justifyContent: 'center' }}>Save Profile</Button>
+        </div>
+      </Card>
+      
+      <Card style={{ maxWidth: 500 }}>
+        <h3 style={{ marginBottom: 14 }}>Change Password</h3>
+        <div className="grid">
+          <Input label="Current Password" type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} placeholder="Current password" />
+          <Input label="New Password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="At least 6 characters" />
+          <Button onClick={changePassword} disabled={busy} style={{ justifyContent: 'center' }}>Change Password</Button>
+        </div>
       </Card>
     </div>
   );
@@ -754,13 +826,39 @@ function History({ shots, beans, onDelete, onExport }) {
 
 function Settings({ workspace, role, onUpdate }) {
   const editable = canManageTeam(role);
+  const [name, setName] = useState(workspace.name);
+  const { addToast } = useToast();
+  
+  const saveName = async () => {
+    if (!name.trim() || name === workspace.name) return;
+    await onUpdate({ name: name.trim() });
+  };
+  
   return (
     <div>
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 20 }}>Settings</h1>
-      <Card style={{ maxWidth: 400 }}>
-        <label className="label">Currency</label>
-        {editable ? <Select value={workspace.currency} onChange={e => onUpdate({ currency: e.target.value })}>{CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}</Select> : <div>{workspace.currency}</div>}
-        {!editable && <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>Only owners can change settings.</div>}
+      
+      {editable && (
+        <Card style={{ maxWidth: 500, marginBottom: 14 }}>
+          <h3 style={{ marginBottom: 14 }}>Workspace</h3>
+          <div className="grid">
+            <Input label="Workspace Name" value={name} onChange={e => setName(e.target.value)} />
+            <Button onClick={saveName} style={{ justifyContent: 'center' }}>Save Name</Button>
+          </div>
+        </Card>
+      )}
+      
+      <Card style={{ maxWidth: 500 }}>
+        <h3 style={{ marginBottom: 14 }}>Preferences</h3>
+        <div className="grid">
+          <Select label="Currency" value={workspace.currency} onChange={e => editable && onUpdate({ currency: e.target.value })} disabled={!editable}>
+            {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </Select>
+          {!editable && <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Only owners can change settings.</div>}
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-muted)', padding: 10, background: 'var(--input-bg)', borderRadius: 6 }}>
+            Invite code: <strong style={{ color: 'var(--primary)' }}>{workspace.invite_code}</strong>
+          </div>
+        </div>
       </Card>
     </div>
   );
