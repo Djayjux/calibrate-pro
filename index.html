@@ -668,25 +668,119 @@ function Shifts({ workspace, userId }) {
   const [myActiveShift, setMyActiveShift] = useState(null);
   const [busy, setBusy] = useState(false);
   const { addToast } = useToast();
-  const loadShifts = async () => { try { const data = await api.getShifts(workspace.id); setShifts(data); const active = data.find(s => String(s.user_id) === String(userId) && (!s.shift_end || String(s.shift_end) === "" || String(s.shift_end) === "ACTIVE")); setMyActiveShift(active || null); } catch (e) { addToast(e.message, 'error'); } };
+  
+  const loadShifts = async () => {
+    try {
+      const data = await api.getShifts(workspace.id);
+      setShifts(data);
+      
+      // VERY robust check — normalize both sides to strings
+      const myId = String(userId).trim();
+      const active = data.find(s => {
+        const shiftUserId = String(s.user_id).trim();
+        const endValue = s.shift_end;
+        const notEnded = !endValue || 
+                         String(endValue).trim() === "" || 
+                         String(endValue).trim() === "ACTIVE" ||
+                         endValue === null ||
+                         endValue === undefined;
+        return shiftUserId === myId && notEnded;
+      });
+      
+      console.log("Shift check — myId:", myId, "Active found:", active ? "YES" : "NO");
+      setMyActiveShift(active || null);
+    } catch (e) { 
+      console.error("Load shifts error:", e);
+      addToast(e.message, 'error'); 
+    }
+  };
+  
   useEffect(() => { loadShifts(); }, [workspace.id, userId]);
-  const startShift = async () => { setBusy(true); try { await api.startShift(workspace.id, ""); addToast('Shift started!', 'success'); await loadShifts(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); };
-  const endShift = async () => { setBusy(true); try { await api.endShift(workspace.id); addToast('Shift ended!', 'success'); await loadShifts(); } catch (e) { addToast(e.message, 'error'); } setBusy(false); };
+  
+  const startShift = async () => {
+    setBusy(true);
+    try { 
+      await api.startShift(workspace.id, ""); 
+      addToast('Shift started!', 'success'); 
+      await loadShifts(); 
+    } catch (e) { addToast(e.message, 'error'); }
+    setBusy(false);
+  };
+  
+  const endShift = async () => {
+    setBusy(true);
+    try { 
+      await api.endShift(workspace.id); 
+      addToast('Shift ended!', 'success'); 
+      await loadShifts(); 
+    } catch (e) { addToast(e.message, 'error'); }
+    setBusy(false);
+  };
+  
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
-        <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>Shifts</h1><p style={{ color: 'var(--text-muted)' }}>{myActiveShift ? '🟢 You are on shift' : '⚪ Not on shift'}</p></div>
-        {myActiveShift ? <Button variant="danger" onClick={endShift} disabled={busy} style={{ fontSize: 14, padding: '10px 20px' }}>{busy ? 'Ending...' : '🔴 End Shift'}</Button> : <Button onClick={startShift} disabled={busy} style={{ fontSize: 14, padding: '10px 20px' }}>{busy ? 'Starting...' : '🟢 Start Shift'}</Button>}
+        <div>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26 }}>Shifts</h1>
+          <p style={{ color: 'var(--text-muted)' }}>
+            {myActiveShift ? '🟢 You are on shift' : '⚪ Not on shift'}
+          </p>
+        </div>
+        {myActiveShift ? (
+          <Button variant="danger" onClick={endShift} disabled={busy} style={{ fontSize: 14, padding: '10px 20px' }}>
+            {busy ? 'Ending...' : '🔴 End Shift'}
+          </Button>
+        ) : (
+          <Button onClick={startShift} disabled={busy} style={{ fontSize: 14, padding: '10px 20px' }}>
+            {busy ? 'Starting...' : '🟢 Start Shift'}
+          </Button>
+        )}
       </div>
-      {myActiveShift && <Card style={{ marginBottom: 14, borderColor: 'var(--success)', background: 'var(--success-dim)' }}><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><span className="live-dot" /><div><strong>Currently Working</strong><div style={{ fontSize: 12, color: 'var(--text-muted)' }}>Started at {fmtTime(myActiveShift.shift_start)} · {fmtDate(myActiveShift.shift_start)}</div></div></div></Card>}
+      
+      {myActiveShift && (
+        <Card style={{ marginBottom: 14, borderColor: 'var(--success)', background: 'var(--success-dim)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span className="live-dot" />
+            <div>
+              <strong>Currently Working</strong>
+              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                Started at {fmtTime(myActiveShift.shift_start)} · {fmtDate(myActiveShift.shift_start)}
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+      
       <Card>
         <h3 style={{ marginBottom: 12 }}>All Shifts</h3>
-        {shifts.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shifts recorded yet.</div> : shifts.slice(0, 20).map(s => { const isActive = !s.shift_end || String(s.shift_end) === "" || String(s.shift_end) === "ACTIVE"; return (<div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Avatar name={s.display_name} color={s.avatar_color} size="sm" /><div><div style={{ fontWeight: 500, fontSize: 13 }}>{s.display_name}{String(s.user_id) === String(userId) ? ' (you)' : ''}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDate(s.shift_start)} · {fmtTime(s.shift_start)} → {isActive ? 'Active' : fmtTime(s.shift_end)}</div></div></div><Badge tone={isActive ? 'sage' : 'muted'}>{isActive ? 'Active' : 'Done'}</Badge></div>); })}
+        {shifts.length === 0 ? (
+          <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No shifts recorded yet.</div>
+        ) : shifts.slice(0, 30).map(s => {
+          const isActive = s.is_active;
+          const isMe = String(s.user_id).trim() === String(userId).trim();
+          return (
+            <div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <Avatar name={s.display_name} color={s.avatar_color} size="sm" />
+                <div>
+                  <div style={{ fontWeight: 500, fontSize: 13 }}>
+                    {s.display_name}{isMe ? ' (you)' : ''}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+                    {fmtDate(s.shift_start)} · {fmtTime(s.shift_start)} → {isActive ? 'Active' : fmtTime(s.shift_end)}
+                    {s.duration_minutes ? ` · ${s.duration_minutes} min` : ''}
+                  </div>
+                </div>
+              </div>
+              <Badge tone={isActive ? 'sage' : 'muted'}>{isActive ? 'Active' : 'Done'}</Badge>
+            </div>
+          );
+        })}
       </Card>
     </div>
   );
 }
-
+  
 function LogShot({ beans, onSave }) {
   const [beanId, setBeanId] = useState(beans[0]?.id || '');
   const [dose, setDose] = useState(beans[0]?.dose_target || '');
