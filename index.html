@@ -7,16 +7,22 @@
 <meta name="description" content="Track espresso shots, manage bean inventory, shifts, and analyze team performance." />
 <meta name="theme-color" content="#c4a572" />
 <meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Calibrate Pro" />
-<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23c4a572'/><text x='50' y='65' font-size='50' text-anchor='middle'>☕</text></svg>" />
+
+<!-- PWA MANIFEST — FIXED -->
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="icon" type="image/png" href="icon-192.png" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
 <style>
 :root{--bg:#0f1115;--card:#1a1d23;--card-hover:#22262e;--border:#2a2e35;--input-bg:#22262e;--text:#f0ede8;--text-muted:#8b9198;--primary:#c4a572;--primary-hover:#d4b582;--primary-dim:#c4a57222;--success:#7fa66b;--success-dim:#7fa66b22;--warning:#d4a545;--warning-dim:#d4a54522;--danger:#c55a4a;--danger-dim:#c55a4a22;--info:#5b8fa8;--info-dim:#5b8fa822;--radius:12px;--radius-sm:8px;--shadow-lg:0 8px 24px rgba(0,0,0,0.4);--font-heading:'Fraunces',serif;--font-body:'Inter',sans-serif;--font-mono:'JetBrains Mono',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 #root{min-height:100vh}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:var(--bg)}
@@ -27,9 +33,11 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes skeleton{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .fade-in{animation:fadeIn .3s ease-out}
 .spinner{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin .6s linear infinite}
 .live-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s ease-in-out infinite;display:inline-block}
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card-hover) 50%,var(--card) 75%);background-size:200% 100%;animation:skeleton 1.5s ease-in-out infinite;border-radius:6px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-weight:500;font-size:14px;transition:all .2s ease;-webkit-tap-highlight-color:transparent}
 .btn:active{transform:scale(.97)}
 .btn:disabled{opacity:.5;cursor:not-allowed}
@@ -45,6 +53,8 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 .card-clickable:hover{background:var(--card-hover)}
 .input,.select,.textarea{width:100%;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:all .2s ease;-webkit-appearance:none}
 .input:focus,.select:focus,.textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-dim)}
+.input.error,.select.error{border-color:var(--danger)}
+.input-error-msg{color:var(--danger);font-size:11px;margin-top:4px}
 .textarea{resize:vertical;min-height:60px}
 .label{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
 .badge{display:inline-flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:10px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:4px 8px;border-radius:4px;white-space:nowrap}
@@ -57,7 +67,16 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 .grid-2{grid-template-columns:repeat(2,1fr)}
 .grid-3{grid-template-columns:repeat(3,1fr)}
 .grid-4{grid-template-columns:repeat(4,1fr)}
-@media(max-width:768px){.grid-2,.grid-3,.grid-4{grid-template-columns:1fr}.sidebar{display:none!important}.main-content{margin-left:0!important;padding:16px!important;padding-bottom:90px!important}.mobile-nav{display:flex!important}}
+
+/* MOBILE NAV — 5 tabs + MORE menu */
+@media(max-width:768px){
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+  .sidebar{display:none!important}
+  .main-content{margin-left:0!important;padding:16px!important;padding-bottom:100px!important}
+  .mobile-nav{display:flex!important}
+  .toast-container{top:auto!important;bottom:90px!important;left:16px!important;right:16px!important;align-items:center}
+  .toast{min-width:auto;max-width:100%;width:100%}
+}
 .toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px}
 .toast{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;min-width:280px;max-width:400px;box-shadow:var(--shadow-lg);cursor:pointer;animation:slideIn .3s ease-out;display:flex;align-items:center;gap:10px}
 .toast-undo{background:var(--primary);color:#14171a;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600;margin-left:auto}
@@ -66,7 +85,14 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 .sidebar-nav-item:hover{background:var(--card-hover);color:var(--text)}
 .sidebar-nav-item.active{background:var(--primary-dim);color:var(--primary)}
 .main-content{margin-left:230px;padding:24px 28px;min-height:100vh}
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:6px 4px;z-index:100;justify-content:space-around;overflow-x:auto}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:6px 4px;z-index:100;justify-content:space-around;padding-bottom:calc(6px + env(safe-area-inset-bottom))}
+.mobile-nav-item{color:var(--text-muted);cursor:pointer;text-align:center;font-size:9px;padding:4px 8px;flex:1;transition:all .2s ease;position:relative}
+.mobile-nav-item.active{color:var(--primary)}
+.mobile-nav-item .nav-icon{font-size:18px;display:block;margin-bottom:2px}
+.mobile-more-menu{position:fixed;bottom:70px;left:12px;right:12px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:8px;z-index:101;box-shadow:var(--shadow-lg);animation:fadeIn .2s ease-out;display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.mobile-more-item{padding:12px;border-radius:6px;cursor:pointer;text-align:center;font-size:11px;transition:all .2s ease;color:var(--text)}
+.mobile-more-item:active{background:var(--card-hover)}
+.mobile-more-item .nav-icon{font-size:20px;display:block;margin-bottom:4px}
 .avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:12px;color:#14171a;flex-shrink:0}
 .avatar-sm{width:24px;height:24px;font-size:10px}
 .avatar-lg{width:44px;height:44px;font-size:14px}
@@ -76,6 +102,13 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 .alert-card{border-color:var(--danger)!important;background:var(--danger-dim)!important}
 .delete-btn{background:none;border:none;color:var(--danger);cursor:pointer;font-size:14px;padding:4px 6px;border-radius:4px;transition:all .2s ease}
 .delete-btn:hover{background:var(--danger-dim)}
+
+/* CUSTOM CONFIRM DIALOG */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10001;padding:20px;animation:fadeIn .2s ease-out}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:400px;width:100%;animation:fadeIn .2s ease-out}
+.modal h3{margin-bottom:10px;font-family:var(--font-heading);font-size:20px}
+.modal p{color:var(--text-muted);margin-bottom:20px;font-size:14px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
 </style>
 </head>
 <body>
@@ -86,7 +119,7 @@ input,select,textarea,button{font-family:inherit;font-size:inherit}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
 
 <script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo, useCallback, createContext, useContext } = React;
+const { useState, useEffect, useMemo, useCallback, createContext, useContext, useRef } = React;
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxHJ7tT61UEKYC7uTzt0RviNpwEWdOj4znyLO012B73I3zxSfrS2HRW2oJvoA43y2Kk/exec";
 
@@ -146,7 +179,6 @@ const ROLE_RANK = { barista: 0, manager: 1, owner: 2 };
 const roleLabel = { owner: "Owner", manager: "Manager", barista: "Barista" };
 const canManageBeans = (role) => ROLE_RANK[role] >= 1;
 const canManageTeam = (role) => role === "owner";
-const canSeeCost = (role) => role === "owner" || role === "manager";
 
 const fmtDate = (iso) => new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" });
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
@@ -187,6 +219,56 @@ function downloadCSV(filename, rows) {
   URL.revokeObjectURL(url);
 }
 
+/* VALIDATION HELPERS — NEW */
+function validateShot({ dose, yieldG, time }) {
+  const errors = {};
+  if (!dose || Number(dose) <= 0 || Number(dose) > 50) errors.dose = "Dose must be 0–50g";
+  if (!yieldG || Number(yieldG) <= 0 || Number(yieldG) > 200) errors.yieldG = "Yield must be 0–200g";
+  if (!time || Number(time) <= 0 || Number(time) > 120) errors.time = "Time must be 0–120s";
+  return errors;
+}
+function validateBean({ name, doseTarget, yieldTarget, timeMin, timeMax }) {
+  const errors = {};
+  if (!name || !name.trim()) errors.name = "Name is required";
+  if (doseTarget && (Number(doseTarget) <= 0 || Number(doseTarget) > 50)) errors.doseTarget = "Must be 0–50g";
+  if (yieldTarget && (Number(yieldTarget) <= 0 || Number(yieldTarget) > 200)) errors.yieldTarget = "Must be 0–200g";
+  if (timeMin && timeMax && Number(timeMin) >= Number(timeMax)) errors.timeMax = "Max must be > min";
+  return errors;
+}
+
+/* CONFIRM DIALOG — NEW */
+const ConfirmContext = createContext();
+function ConfirmProvider({ children }) {
+  const [dialog, setDialog] = useState(null);
+  const confirm = useCallback((title, message, danger = true) => {
+    return new Promise((resolve) => {
+      setDialog({ title, message, danger, resolve });
+    });
+  }, []);
+  const close = (result) => {
+    if (dialog) dialog.resolve(result);
+    setDialog(null);
+  };
+  return (
+    <ConfirmContext.Provider value={confirm}>
+      {children}
+      {dialog && (
+        <div className="modal-overlay" onClick={() => close(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>{dialog.title}</h3>
+            <p>{dialog.message}</p>
+            <div className="modal-actions">
+              <Button variant="ghost" onClick={() => close(false)}>Cancel</Button>
+              <Button variant={dialog.danger ? 'danger' : 'primary'} onClick={() => close(true)}>Confirm</Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </ConfirmContext.Provider>
+  );
+}
+const useConfirm = () => useContext(ConfirmContext);
+
 const ToastContext = createContext();
 function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
@@ -215,12 +297,22 @@ const useToast = () => useContext(ToastContext);
 
 function Button({ children, variant = 'primary', size = '', style, ...props }) { return <button className={`btn btn-${variant} ${size ? 'btn-' + size : ''}`} style={style} {...props}>{children}</button>; }
 function Card({ children, className = '', ...props }) { return <div className={`card ${className}`} {...props}>{children}</div>; }
-function Input({ label, ...props }) { return <div>{label && <label className="label">{label}</label>}<input className="input" {...props} /></div>; }
+function Input({ label, error, ...props }) { return <div>{label && <label className="label">{label}</label>}<input className={`input ${error ? 'error' : ''}`} {...props} />{error && <div className="input-error-msg">{error}</div>}</div>; }
 function Select({ label, children, ...props }) { return <div>{label && <label className="label">{label}</label>}<select className="select" {...props}>{children}</select></div>; }
 function Textarea({ label, ...props }) { return <div>{label && <label className="label">{label}</label>}<textarea className="textarea" {...props} /></div>; }
 function Badge({ children, tone = 'muted' }) { return <span className={`badge badge-${tone}`}>{children}</span>; }
 function Avatar({ name, color, size = '' }) { return <div className={`avatar avatar-${size}`} style={{ background: color || 'var(--primary)' }}>{(name || '?').charAt(0).toUpperCase()}</div>; }
 function LoadingScreen() { return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ textAlign: 'center' }}><div className="spinner" style={{ width: 40, height: 40, borderWidth: 3 }} /><div style={{ marginTop: 12, color: 'var(--text-muted)' }}>Loading...</div></div></div>; }
+
+function SkeletonCard() {
+  return (
+    <div className="card">
+      <div className="skeleton" style={{ height: 20, width: '60%', marginBottom: 12 }} />
+      <div className="skeleton" style={{ height: 14, width: '40%', marginBottom: 8 }} />
+      <div className="skeleton" style={{ height: 14, width: '80%' }} />
+    </div>
+  );
+}
 
 function AuthScreen({ onAuthed }) {
   const [mode, setMode] = useState('signup');
@@ -369,16 +461,68 @@ function WorkspacePicker({ onSelect }) {
   );
 }
 
+/* MOBILE NAV — NEW: 5 tabs + More */
+const PRIMARY_TABS = ['dashboard', 'log', 'shifts', 'beans', 'history'];
+const ALL_NAV = [
+  { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+  { id: 'log', label: 'Log Shot', icon: '☕' },
+  { id: 'shifts', label: 'Shifts', icon: '🕐' },
+  { id: 'beans', label: 'Beans', icon: '🌱' },
+  { id: 'inventory', label: 'Inventory', icon: '📦' },
+  { id: 'waste', label: 'Waste', icon: '🗑️' },
+  { id: 'team', label: 'Team', icon: '👥' },
+  { id: 'history', label: 'History', icon: '📜' },
+  { id: 'profile', label: 'Profile', icon: '👤' },
+  { id: 'settings', label: 'Settings', icon: '⚙️' },
+];
+
+function MobileNav({ tab, setTab }) {
+  const [showMore, setShowMore] = useState(false);
+  const primaryItems = ALL_NAV.filter(item => PRIMARY_TABS.includes(item.id));
+  const moreItems = ALL_NAV.filter(item => !PRIMARY_TABS.includes(item.id));
+  const isMoreActive = moreItems.some(item => item.id === tab);
+  
+  return (
+    <>
+      {showMore && (
+        <>
+          <div onClick={() => setShowMore(false)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 100 }} />
+          <div className="mobile-more-menu">
+            {moreItems.map(item => (
+              <div key={item.id} className="mobile-more-item" onClick={() => { setTab(item.id); setShowMore(false); }} style={{ background: tab === item.id ? 'var(--primary-dim)' : 'transparent' }}>
+                <span className="nav-icon">{item.icon}</span>
+                {item.label}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      <div className="mobile-nav">
+        {primaryItems.map(item => (
+          <div key={item.id} className={`mobile-nav-item ${tab === item.id ? 'active' : ''}`} onClick={() => { setTab(item.id); setShowMore(false); }}>
+            <span className="nav-icon">{item.icon}</span>
+            {item.label}
+          </div>
+        ))}
+        <div className={`mobile-nav-item ${isMoreActive ? 'active' : ''}`} onClick={() => setShowMore(!showMore)}>
+          <span className="nav-icon">{showMore ? '✕' : '⋯'}</span>
+          More
+        </div>
+      </div>
+    </>
+  );
+}
+
 function MainApp() {
   const [user, setUser] = useState(undefined);
   const [workspace, setWorkspace] = useState(null);
   const [role, setRole] = useState(null);
-  const [canSeeCostFlag, setCanSeeCostFlag] = useState(false);
   const [tab, setTab] = useState('dashboard');
   const [data, setData] = useState({ beans: [], shots: [], waste: [], deliveries: [], members: [] });
   const [loading, setLoading] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { addToast } = useToast();
+  const confirm = useConfirm();
   
   useEffect(() => {
     const online = () => setIsOnline(true);
@@ -402,7 +546,6 @@ function MainApp() {
     try {
       const d = await api.getWorkspaceData(wsId);
       setData({ beans: d.beans || [], shots: d.shots || [], waste: d.waste || [], deliveries: d.deliveries || [], members: d.members || [] });
-      setCanSeeCostFlag(d.canSeeCost || false);
     } catch (e) { addToast(e.message, 'error'); }
     finally { setLoading(false); }
   }, [addToast]);
@@ -413,19 +556,6 @@ function MainApp() {
   if (!user) return <AuthScreen onAuthed={(u) => setUser(u)} />;
   if (!workspace) return <WorkspacePicker onSelect={(ws, r) => { setWorkspace(ws); setRole(r); setTab('dashboard'); }} />;
   
-  const NAV = [
-    { id: 'dashboard', label: 'Dashboard', icon: '📊' },
-    { id: 'log', label: 'Log Shot', icon: '☕' },
-    { id: 'shifts', label: 'Shifts', icon: '🕐' },
-    { id: 'beans', label: 'Beans', icon: '🌱' },
-    { id: 'inventory', label: 'Inventory', icon: '📦' },
-    { id: 'waste', label: 'Waste', icon: '🗑️' },
-    { id: 'team', label: 'Team', icon: '👥' },
-    { id: 'history', label: 'History', icon: '📜' },
-    { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' },
-  ];
-  
   const refresh = () => loadData(workspace.id);
   
   const exportData = () => {
@@ -434,6 +564,17 @@ function MainApp() {
     data.waste.forEach(w => { const bean = data.beans.find(b => b.id === w.bean_id); rows.push(["Waste", bean?.name || "", w.display_name || "", "", "", "", "", w.reason, w.created_at]); });
     downloadCSV(`calibrate_export_${new Date().toISOString().split('T')[0]}.csv`, rows);
     addToast('Data exported!', 'success');
+  };
+  
+  /* Bean delete with confirmation + undo */
+  const handleRemoveBean = async (id) => {
+    const ok = await confirm('Remove Bean?', 'This bean profile will be removed. Historical shots will remain.');
+    if (!ok) return;
+    try {
+      await api.removeBean(workspace.id, id);
+      addToast('Bean removed', 'success');
+      refresh();
+    } catch (e) { addToast(e.message, 'error'); }
   };
   
   return (
@@ -447,7 +588,7 @@ function MainApp() {
           <div style={{ fontFamily: 'var(--font-heading)', fontSize: 17, fontWeight: 600 }}>Calibrate Pro</div>
           <div style={{ fontSize: 10, color: 'var(--text-muted)' }}>Espresso Intelligence</div>
         </div>
-        {NAV.map(item => (
+        {ALL_NAV.map(item => (
           <div key={item.id} className={`sidebar-nav-item ${tab === item.id ? 'active' : ''}`} onClick={() => setTab(item.id)}>
             <span>{item.icon}</span><span>{item.label}</span>
           </div>
@@ -466,23 +607,17 @@ function MainApp() {
         </div>
       </div>
       
-      <div className="mobile-nav">
-        {NAV.map(item => (
-          <div key={item.id} onClick={() => setTab(item.id)} style={{ color: tab === item.id ? 'var(--primary)' : 'var(--text-muted)', cursor: 'pointer', textAlign: 'center', fontSize: 9, padding: '2px 4px', minWidth: 44 }}>
-            <div style={{ fontSize: 16 }}>{item.icon}</div><div>{item.label}</div>
-          </div>
-        ))}
-      </div>
+      <MobileNav tab={tab} setTab={setTab} />
       
       <div className="main-content">
-        {tab === 'dashboard' && <Dashboard data={data} workspace={workspace} onExport={exportData} canSeeCost={canSeeCostFlag} />}
+        {tab === 'dashboard' && <Dashboard data={data} workspace={workspace} onExport={exportData} loading={loading} />}
         {tab === 'log' && <LogShot beans={data.beans} onSave={async (shot) => { await api.addShot(workspace.id, shot); addToast('Shot logged!', 'success'); refresh(); }} />}
         {tab === 'shifts' && <Shifts workspace={workspace} userId={user.id} />}
-        {tab === 'beans' && <Beans beans={data.beans} role={role} canSeeCost={canSeeCostFlag} onAdd={async (bean) => { await api.addBean(workspace.id, bean); addToast('Bean added!', 'success'); refresh(); }} onRemove={async (id) => { if (window.confirm('Remove this bean?')) { await api.removeBean(workspace.id, id); addToast('Bean removed', 'success'); refresh(); } }} />}
-        {tab === 'inventory' && <Inventory beans={data.beans} shots={data.shots} waste={data.waste} deliveries={data.deliveries} role={role} canSeeCost={canSeeCostFlag} currency={workspace.currency} onDeliver={async (d) => { await api.addDelivery(workspace.id, d); addToast('Delivery recorded!', 'success'); refresh(); }} onDeleteDelivery={async (id) => { const result = await api.deleteDelivery(workspace.id, id); refresh(); addToast('Delivery deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreDelivery(workspace.id, result.deletedDelivery); refresh(); } }); }} />}
-        {tab === 'waste' && <Waste beans={data.beans} waste={data.waste} onAdd={async (w) => { await api.addWaste(workspace.id, w); addToast('Waste logged!', 'success'); refresh(); }} onDelete={async (id) => { const result = await api.deleteWaste(workspace.id, id); refresh(); addToast('Waste deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreWaste(workspace.id, result.deletedWaste); refresh(); } }); }} />}
-        {tab === 'team' && <Team data={data} workspace={workspace} role={role} userId={user.id} onChangeRole={async (uid, r) => { await api.changeRole(workspace.id, uid, r); addToast('Role updated!', 'success'); refresh(); }} onRemove={async (uid) => { if (window.confirm('Remove this member?')) { await api.removeMember(workspace.id, uid); addToast('Member removed', 'success'); refresh(); } }} />}
-        {tab === 'history' && <History shots={data.shots} beans={data.beans} onDelete={async (id) => { const result = await api.deleteShot(workspace.id, id); refresh(); addToast('Shot deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreShot(workspace.id, result.deletedShot); refresh(); } }); }} onExport={() => { const rows = [["Date", "Bean", "Barista", "Dose", "Yield", "Time", "Rating", "Notes"]]; data.shots.forEach(s => { const bean = data.beans.find(b => b.id === s.bean_id); rows.push([s.created_at, bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || ""]); }); downloadCSV('shot_history.csv', rows); addToast('History exported!', 'success'); }} />}
+        {tab === 'beans' && <Beans beans={data.beans} role={role} onAdd={async (bean) => { await api.addBean(workspace.id, bean); addToast('Bean added!', 'success'); refresh(); }} onRemove={handleRemoveBean} />}
+        {tab === 'inventory' && <Inventory beans={data.beans} shots={data.shots} waste={data.waste} deliveries={data.deliveries} role={role} currency={workspace.currency} onDeliver={async (d) => { await api.addDelivery(workspace.id, d); addToast('Delivery recorded!', 'success'); refresh(); }} onDeleteDelivery={async (id) => { const ok = await confirm('Delete Delivery?', 'Stock will be decreased.'); if (!ok) return; const result = await api.deleteDelivery(workspace.id, id); refresh(); addToast('Delivery deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreDelivery(workspace.id, result.deletedDelivery); refresh(); } }); }} />}
+        {tab === 'waste' && <Waste beans={data.beans} waste={data.waste} onAdd={async (w) => { await api.addWaste(workspace.id, w); addToast('Waste logged!', 'success'); refresh(); }} onDelete={async (id) => { const ok = await confirm('Delete Waste Entry?', 'Stock will be restored.'); if (!ok) return; const result = await api.deleteWaste(workspace.id, id); refresh(); addToast('Waste deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreWaste(workspace.id, result.deletedWaste); refresh(); } }); }} />}
+        {tab === 'team' && <Team data={data} workspace={workspace} role={role} userId={user.id} onChangeRole={async (uid, r) => { await api.changeRole(workspace.id, uid, r); addToast('Role updated!', 'success'); refresh(); }} onRemove={async (uid) => { const ok = await confirm('Remove Member?', 'They will lose access to this workspace.'); if (!ok) return; await api.removeMember(workspace.id, uid); addToast('Member removed', 'success'); refresh(); }} />}
+        {tab === 'history' && <History shots={data.shots} beans={data.beans} onDelete={async (id) => { const ok = await confirm('Delete Shot?', 'Stock will be restored.'); if (!ok) return; const result = await api.deleteShot(workspace.id, id); refresh(); addToast('Shot deleted', 'success', { label: 'Undo', onClick: async () => { await api.restoreShot(workspace.id, result.deletedShot); refresh(); } }); }} onExport={() => { const rows = [["Date", "Bean", "Barista", "Dose", "Yield", "Time", "Rating", "Notes"]]; data.shots.forEach(s => { const bean = data.beans.find(b => b.id === s.bean_id); rows.push([s.created_at, bean?.name || "", s.display_name || "", s.dose, s.yield, s.time_s, s.rating, s.notes || ""]); }); downloadCSV('shot_history.csv', rows); addToast('History exported!', 'success'); }} />}
         {tab === 'profile' && <Profile user={user} onUpdate={(u) => setUser(u)} />}
         {tab === 'settings' && <Settings workspace={workspace} role={role} onUpdate={async (fields) => { await api.updateWorkspace(workspace.id, fields); setWorkspace(w => ({ ...w, ...fields })); addToast('Settings updated!', 'success'); }} />}
       </div>
@@ -490,7 +625,7 @@ function MainApp() {
   );
 }
 
-function Dashboard({ data, workspace, onExport, canSeeCost }) {
+function Dashboard({ data, workspace, onExport, loading }) {
   const { beans, shots, waste } = data;
   const today = new Date().toDateString();
   const shotsToday = shots.filter(s => new Date(s.created_at).toDateString() === today).length;
@@ -561,9 +696,20 @@ function LogShot({ beans, onSave }) {
   const [notes, setNotes] = useState('');
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState({});
   const ratio = dose && yieldG ? (Number(yieldG) / Number(dose)).toFixed(2) : null;
-  const canSave = beanId && dose && yieldG && time;
-  const save = async () => { if (!canSave) return; setBusy(true); await onSave({ beanId, dose: Number(dose), yield: Number(yieldG), timeS: Number(time), ratio: Number(ratio), rating, notes: notes.trim() }); setSaved(true); setDose(''); setYieldG(''); setTime(''); setNotes(''); setRating(3); setBusy(false); setTimeout(() => setSaved(false), 1800); };
+  
+  const save = async () => {
+    const errs = validateShot({ dose, yieldG, time });
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+    if (busy) return;
+    setBusy(true);
+    await onSave({ beanId, dose: Number(dose), yield: Number(yieldG), timeS: Number(time), ratio: Number(ratio), rating, notes: notes.trim() });
+    setSaved(true); setDose(''); setYieldG(''); setTime(''); setNotes(''); setRating(3); setErrors({}); setBusy(false);
+    setTimeout(() => setSaved(false), 1800);
+  };
+  
   if (beans.length === 0) return <div><h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 14 }}>Log Shot</h1><Card><div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: 20 }}>Add a bean profile first.</div></Card></div>;
   return (
     <div>
@@ -573,21 +719,21 @@ function LogShot({ beans, onSave }) {
         <div className="grid">
           <Select label="Bean" value={beanId} onChange={e => { setBeanId(e.target.value); const b = beans.find(x => x.id === e.target.value); if (b) { setDose(b.dose_target || ''); setYieldG(b.yield_target || ''); } }}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
           <div className="grid grid-3">
-            <Input label="Dose (g)" type="number" step="0.1" value={dose} onChange={e => setDose(e.target.value)} placeholder="18" />
-            <Input label="Yield (g)" type="number" step="0.1" value={yieldG} onChange={e => setYieldG(e.target.value)} placeholder="36" />
-            <Input label="Time (s)" type="number" value={time} onChange={e => setTime(e.target.value)} placeholder="28" />
+            <Input label="Dose (g)" type="number" step="0.1" value={dose} onChange={e => setDose(e.target.value)} placeholder="18" error={errors.dose} />
+            <Input label="Yield (g)" type="number" step="0.1" value={yieldG} onChange={e => setYieldG(e.target.value)} placeholder="36" error={errors.yieldG} />
+            <Input label="Time (s)" type="number" value={time} onChange={e => setTime(e.target.value)} placeholder="28" error={errors.time} />
           </div>
           {ratio && <div style={{ fontFamily: 'var(--font-mono)', fontSize: 13, color: 'var(--primary)' }}>Ratio 1:{ratio}</div>}
           <div><label className="label">Taste (1 sour — 5 bitter)</label><div style={{ display: 'flex', gap: 6 }}>{[1, 2, 3, 4, 5].map(n => (<div key={n} onClick={() => setRating(n)} style={{ width: 40, height: 40, borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontFamily: 'var(--font-mono)', fontSize: 13, background: rating === n ? 'var(--primary)' : 'var(--input-bg)', color: rating === n ? '#14171a' : 'var(--text-muted)', border: '1px solid var(--border)' }}>{n}</div>))}</div></div>
           <Textarea label="Notes (optional)" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Channeling on left side..." />
-          <Button onClick={save} disabled={!canSave || busy} style={{ justifyContent: 'center', opacity: canSave ? 1 : 0.5 }}>{saved ? '✓ Logged!' : busy ? 'Saving...' : 'Save Shot'}</Button>
+          <Button onClick={save} disabled={busy} style={{ justifyContent: 'center' }}>{saved ? '✓ Logged!' : busy ? 'Saving...' : 'Save Shot'}</Button>
         </div>
       </Card>
     </div>
   );
 }
 
-function Beans({ beans, role, canSeeCost, onAdd, onRemove }) {
+function Beans({ beans, role, onAdd, onRemove }) {
   const [showForm, setShowForm] = useState(false);
   const locked = !canManageBeans(role);
   return (
@@ -597,43 +743,46 @@ function Beans({ beans, role, canSeeCost, onAdd, onRemove }) {
         {!locked && <Button onClick={() => setShowForm(!showForm)}>{showForm ? 'Cancel' : '+ Add Bean'}</Button>}
       </div>
       {locked && <Card style={{ marginBottom: 14 }}><div style={{ color: 'var(--text-muted)', fontSize: 13 }}>Only managers and owners can manage beans.</div></Card>}
-      {showForm && !locked && <BeanForm onSave={onAdd} onClose={() => setShowForm(false)} canSeeCost={canSeeCost} />}
-      {beans.length === 0 && !showForm ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No beans yet.</div></Card> : (<div className="grid grid-2">{beans.map(b => (<Card key={b.id}><div style={{ display: 'flex', justifyContent: 'space-between' }}><div><div style={{ fontWeight: 600 }}>{b.name}</div>{b.origin && <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{b.origin}</div>}</div>{!locked && <button className="delete-btn" onClick={() => onRemove(b.id)}>×</button>}</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>{b.dose_target}g → {b.yield_target}g · {b.time_min}–{b.time_max}s</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>Stock: {Number(b.stock_kg || 0).toFixed(1)}kg{canSeeCost && b.cost_per_kg ? ` · $${b.cost_per_kg}/kg` : ''}</div></Card>))}</div>)}
+      {showForm && !locked && <BeanForm onSave={onAdd} onClose={() => setShowForm(false)} />}
+      {beans.length === 0 && !showForm ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No beans yet.</div></Card> : (<div className="grid grid-2">{beans.map(b => (<Card key={b.id}><div style={{ display: 'flex', justifyContent: 'space-between' }}><div><div style={{ fontWeight: 600 }}>{b.name}</div>{b.origin && <div style={{ color: 'var(--text-muted)', fontSize: 12 }}>{b.origin}</div>}</div>{!locked && <button className="delete-btn" onClick={() => onRemove(b.id)}>×</button>}</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 6 }}>{b.dose_target}g → {b.yield_target}g · {b.time_min}–{b.time_max}s</div><div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-muted)', marginTop: 3 }}>Stock: {Number(b.stock_kg || 0).toFixed(1)}kg</div></Card>))}</div>)}
     </div>
   );
 }
 
-function BeanForm({ onSave, onClose, canSeeCost }) {
+function BeanForm({ onSave, onClose }) {
   const [f, setF] = useState({ name: '', origin: '', roaster: '', roastDate: '', doseTarget: '18', yieldTarget: '36', timeMin: '25', timeMax: '32', stockKg: '', costPerKg: '', lowStockDays: '3' });
+  const [errors, setErrors] = useState({});
+  const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
-  const save = async () => { if (!f.name.trim()) return; await onSave({ name: f.name.trim(), origin: f.origin.trim(), roaster: f.roaster.trim(), roastDate: f.roastDate, doseTarget: Number(f.doseTarget), yieldTarget: Number(f.yieldTarget), timeMin: Number(f.timeMin), timeMax: Number(f.timeMax), stockKg: Number(f.stockKg) || 0, costPerKg: f.costPerKg ? Number(f.costPerKg) : '', lowStockDays: Number(f.lowStockDays) || 3 }); onClose(); };
+  const save = async () => {
+    const errs = validateBean({ name: f.name, doseTarget: f.doseTarget, yieldTarget: f.yieldTarget, timeMin: f.timeMin, timeMax: f.timeMax });
+    setErrors(errs);
+    if (Object.keys(errs).length > 0) return;
+    if (busy) return;
+    setBusy(true);
+    await onSave({ name: f.name.trim(), origin: f.origin.trim(), roaster: f.roaster.trim(), roastDate: f.roastDate, doseTarget: Number(f.doseTarget), yieldTarget: Number(f.yieldTarget), timeMin: Number(f.timeMin), timeMax: Number(f.timeMax), stockKg: Number(f.stockKg) || 0, costPerKg: f.costPerKg ? Number(f.costPerKg) : '', lowStockDays: Number(f.lowStockDays) || 3 });
+    onClose();
+  };
   return (
     <Card style={{ marginBottom: 14 }}>
       <div className="grid">
-        <Input label="Bean Name *" value={f.name} onChange={set('name')} placeholder="Ethiopia Yirgacheffe" />
+        <Input label="Bean Name *" value={f.name} onChange={set('name')} placeholder="Ethiopia Yirgacheffe" error={errors.name} />
         <div className="grid grid-2"><Input label="Origin" value={f.origin} onChange={set('origin')} /><Input label="Roaster" value={f.roaster} onChange={set('roaster')} /></div>
         <Input label="Roast Date" type="date" value={f.roastDate} onChange={set('roastDate')} />
-        <div className="grid grid-2"><Input label="Dose (g)" type="number" value={f.doseTarget} onChange={set('doseTarget')} /><Input label="Yield (g)" type="number" value={f.yieldTarget} onChange={set('yieldTarget')} /></div>
-        <div className="grid grid-2"><Input label="Time Min (s)" type="number" value={f.timeMin} onChange={set('timeMin')} /><Input label="Time Max (s)" type="number" value={f.timeMax} onChange={set('timeMax')} /></div>
-        {canSeeCost ? (
-          <div className="grid grid-3">
-            <Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} />
-            <Input label="Cost/kg" type="number" step="0.01" value={f.costPerKg} onChange={set('costPerKg')} />
-            <Input label="Low (days)" type="number" value={f.lowStockDays} onChange={set('lowStockDays')} />
-          </div>
-        ) : (
-          <div className="grid grid-2">
-            <Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} />
-            <Input label="Low (days)" type="number" value={f.lowStockDays} onChange={set('lowStockDays')} />
-          </div>
-        )}
-        <div style={{ display: 'flex', gap: 8 }}><Button onClick={save} style={{ flex: 1, justifyContent: 'center' }}>Save Bean</Button><Button variant="ghost" onClick={onClose}>Cancel</Button></div>
+        <div className="grid grid-2"><Input label="Dose (g)" type="number" value={f.doseTarget} onChange={set('doseTarget')} error={errors.doseTarget} /><Input label="Yield (g)" type="number" value={f.yieldTarget} onChange={set('yieldTarget')} error={errors.yieldTarget} /></div>
+        <div className="grid grid-2"><Input label="Time Min (s)" type="number" value={f.timeMin} onChange={set('timeMin')} /><Input label="Time Max (s)" type="number" value={f.timeMax} onChange={set('timeMax')} error={errors.timeMax} /></div>
+        <div className="grid grid-3">
+          <Input label="Stock (kg)" type="number" step="0.1" value={f.stockKg} onChange={set('stockKg')} />
+          <Input label="Cost/kg" type="number" step="0.01" value={f.costPerKg} onChange={set('costPerKg')} />
+          <Input label="Low (days)" type="number" value={f.lowStockDays} onChange={set('lowStockDays')} />
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}><Button onClick={save} disabled={busy} style={{ flex: 1, justifyContent: 'center' }}>{busy ? 'Saving...' : 'Save Bean'}</Button><Button variant="ghost" onClick={onClose}>Cancel</Button></div>
       </div>
     </Card>
   );
 }
 
-function Inventory({ beans, shots, waste, deliveries, role, canSeeCost, currency, onDeliver, onDeleteDelivery }) {
+function Inventory({ beans, shots, waste, deliveries, role, currency, onDeliver, onDeleteDelivery }) {
   const locked = !canManageBeans(role);
   const rows = useMemo(() => beans.map(b => { const usage = dailyUsageKg(b.id, shots, waste); const rem = daysRemaining(b, usage); return { ...b, usage, rem, tone: stockTone(b, rem) }; }), [beans, shots, waste]);
   return (
@@ -641,27 +790,28 @@ function Inventory({ beans, shots, waste, deliveries, role, canSeeCost, currency
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 4 }}>Inventory</h1>
       <p style={{ color: 'var(--text-muted)', marginBottom: 20 }}>Stock levels and usage</p>
       {beans.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>Add beans first.</div></Card> : (<div className="grid" style={{ marginBottom: 14 }}>{rows.map(r => (<Card key={r.id}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}><div><div style={{ fontWeight: 600 }}>{r.name}</div><div style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>{Number(r.stock_kg || 0).toFixed(1)}kg · ~{(r.usage * 1000).toFixed(0)}g/day</div></div><Badge tone={r.tone}>{r.rem === null ? 'No data' : `${r.rem.toFixed(1)} days`}</Badge></div><div className="progress-bar"><div className="progress-fill" style={{ width: `${Math.min(100, r.rem === null ? 100 : (r.rem / 14) * 100)}%`, background: toneColor(r.tone) }} /></div></Card>))}</div>)}
-      {!locked && beans.length > 0 && <Card style={{ marginBottom: 14 }}><h3 style={{ marginBottom: 10 }}>Record Delivery</h3><DeliveryForm beans={beans} onSave={onDeliver} canSeeCost={canSeeCost} /></Card>}
+      {!locked && beans.length > 0 && <Card style={{ marginBottom: 14 }}><h3 style={{ marginBottom: 10 }}>Record Delivery</h3><DeliveryForm beans={beans} onSave={onDeliver} /></Card>}
       {deliveries.length > 0 && (<Card><h3 style={{ marginBottom: 10 }}>Recent Deliveries</h3>{deliveries.slice(0, 10).map(d => { const bean = beans.find(b => b.id === d.bean_id); return (<div key={d.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)', fontSize: 12 }}><div>{bean?.name || '—'} · {d.display_name} · {fmtDate(d.created_at)}</div><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ color: 'var(--success)', fontFamily: 'var(--font-mono)' }}>+{d.kg}kg</span>{!locked && <button className="delete-btn" onClick={() => onDeleteDelivery(d.id)}>🗑️</button>}</div></div>); })}</Card>)}
     </div>
   );
 }
 
-function DeliveryForm({ beans, onSave, canSeeCost }) {
+function DeliveryForm({ beans, onSave }) {
   const [beanId, setBeanId] = useState(beans[0]?.id || '');
   const [kg, setKg] = useState('');
   const [cost, setCost] = useState('');
   const [supplier, setSupplier] = useState('');
-  const submit = async () => { if (!beanId || !kg) return; await onSave({ beanId, kg: Number(kg), costPerKg: cost ? Number(cost) : '', supplier: supplier.trim() }); setKg(''); setCost(''); setSupplier(''); };
+  const [busy, setBusy] = useState(false);
+  const submit = async () => { if (!beanId || !kg || busy) return; setBusy(true); await onSave({ beanId, kg: Number(kg), costPerKg: cost ? Number(cost) : '', supplier: supplier.trim() }); setKg(''); setCost(''); setSupplier(''); setBusy(false); };
   return (
     <div className="grid">
       <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
       <div className="grid grid-3">
         <Input label="Kg" type="number" step="0.1" value={kg} onChange={e => setKg(e.target.value)} placeholder="5" />
-        {canSeeCost && <Input label="Cost/kg" type="number" step="0.01" value={cost} onChange={e => setCost(e.target.value)} placeholder="optional" />}
+        <Input label="Cost/kg" type="number" step="0.01" value={cost} onChange={e => setCost(e.target.value)} placeholder="optional" />
         <Input label="Supplier" value={supplier} onChange={e => setSupplier(e.target.value)} placeholder="optional" />
       </div>
-      <Button onClick={submit} style={{ justifyContent: 'center' }}>Add Delivery</Button>
+      <Button onClick={submit} disabled={busy} style={{ justifyContent: 'center' }}>{busy ? 'Adding...' : 'Add Delivery'}</Button>
     </div>
   );
 }
@@ -671,8 +821,9 @@ function Waste({ beans, waste, onAdd, onDelete }) {
   const [beanId, setBeanId] = useState(beans[0]?.id || '');
   const [amount, setAmount] = useState('');
   const [reason, setReason] = useState(WASTE_REASONS[0]);
+  const [busy, setBusy] = useState(false);
   const todayTotal = waste.filter(w => new Date(w.created_at).toDateString() === new Date().toDateString()).reduce((a, w) => a + Number(w.amount_g || 0), 0);
-  const save = async () => { if (!amount || !beanId) return; await onAdd({ beanId, amountG: Number(amount), reason }); setAmount(''); };
+  const save = async () => { if (!amount || !beanId || busy) return; setBusy(true); await onAdd({ beanId, amountG: Number(amount), reason }); setAmount(''); setBusy(false); };
   return (
     <div>
       <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, marginBottom: 4 }}>Waste</h1>
@@ -681,7 +832,7 @@ function Waste({ beans, waste, onAdd, onDelete }) {
         <div className="grid">
           <Select label="Bean" value={beanId} onChange={e => setBeanId(e.target.value)}>{beans.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</Select>
           <div className="grid grid-2"><Input label="Amount (g)" type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="18" /><Select label="Reason" value={reason} onChange={e => setReason(e.target.value)}>{WASTE_REASONS.map(r => <option key={r} value={r}>{r}</option>)}</Select></div>
-          <Button onClick={save} disabled={!beans.length} style={{ justifyContent: 'center' }}>Log Waste</Button>
+          <Button onClick={save} disabled={!beans.length || busy} style={{ justifyContent: 'center' }}>{busy ? 'Logging...' : 'Log Waste'}</Button>
         </div>
       </Card>
       {waste.length === 0 ? <Card><div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>No waste logged yet.</div></Card> : waste.slice(0, 15).map(w => { const bean = beans.find(b => b.id === w.bean_id); return (<Card key={w.id} style={{ marginBottom: 6, padding: 12 }}><div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}><div><div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{w.reason} · {w.display_name} · {fmtDateTime(w.created_at)}</div></div><div style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ fontFamily: 'var(--font-mono)', color: 'var(--warning)', fontSize: 13 }}>{w.amount_g}g</span><button className="delete-btn" onClick={() => onDelete(w.id)}>🗑️</button></div></div></Card>); })}
@@ -716,6 +867,7 @@ function Team({ data, workspace, role, userId, onChangeRole, onRemove }) {
 function History({ shots, beans, onDelete, onExport }) {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('all');
+  const [visibleCount, setVisibleCount] = useState(50);
   const filtered = useMemo(() => {
     let list = shots;
     if (search.trim()) {
@@ -743,11 +895,16 @@ function History({ shots, beans, onDelete, onExport }) {
       </div>
       <div style={{ display: 'flex', gap: 6, marginBottom: 14, flexWrap: 'wrap' }}>
         {[{ id: 'all', label: 'All' }, { id: 'today', label: 'Today' }, { id: 'week', label: 'Last 7 days' }, { id: 'optimal', label: '✓ Optimal' }, { id: 'issues', label: '⚠ Issues' }].map(f => (
-          <button key={f.id} onClick={() => setFilter(f.id)} className={`btn ${filter === f.id ? 'btn-primary' : 'btn-ghost'} btn-sm`}>{f.label}</button>
+          <button key={f.id} onClick={() => { setFilter(f.id); setVisibleCount(50); }} className={`btn ${filter === f.id ? 'btn-primary' : 'btn-ghost'} btn-sm`}>{f.label}</button>
         ))}
       </div>
       <Card>
-        {filtered.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>{shots.length === 0 ? 'No shots yet.' : 'No shots match your filter.'}</div> : filtered.slice(0, 100).map(s => { const bean = beans.find(b => b.id === s.bean_id); const status = shotStatus(s, bean); return (<div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}><div><div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}{s.notes ? ` · ${s.notes}` : ''}</div></div><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 11 }}><div>{s.dose}g:{s.yield}g · {s.time_s}s</div><Badge tone={status.tone}>{status.label}</Badge></div><button className="delete-btn" onClick={() => onDelete(s.id)} title="Delete shot">🗑️</button></div></div>); })}
+        {filtered.length === 0 ? <div style={{ textAlign: 'center', color: 'var(--text-muted)', padding: 20 }}>{shots.length === 0 ? 'No shots yet.' : 'No shots match your filter.'}</div> : filtered.slice(0, visibleCount).map(s => { const bean = beans.find(b => b.id === s.bean_id); const status = shotStatus(s, bean); return (<div key={s.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--border)' }}><div><div style={{ fontWeight: 500, fontSize: 13 }}>{bean?.name || 'Unknown'}</div><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>{fmtDateTime(s.created_at)} · {s.display_name}{s.notes ? ` · ${s.notes}` : ''}</div></div><div style={{ display: 'flex', alignItems: 'center', gap: 10 }}><div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: 11 }}><div>{s.dose}g:{s.yield}g · {s.time_s}s</div><Badge tone={status.tone}>{status.label}</Badge></div><button className="delete-btn" onClick={() => onDelete(s.id)} title="Delete shot">🗑️</button></div></div>); })}
+        {filtered.length > visibleCount && (
+          <div style={{ textAlign: 'center', marginTop: 16 }}>
+            <Button variant="ghost" onClick={() => setVisibleCount(c => c + 50)}>Load More ({filtered.length - visibleCount} remaining)</Button>
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -763,6 +920,7 @@ function Profile({ user, onUpdate }) {
   const [avatarColor, setAvatarColor] = useState(user.avatar_color);
   
   const saveProfile = async () => {
+    if (busy) return;
     setBusy(true);
     try {
       const result = await api.updateProfile(displayName, avatarColor);
@@ -775,6 +933,7 @@ function Profile({ user, onUpdate }) {
   const changePassword = async () => {
     if (!oldPassword || !newPassword) { addToast('Fill both password fields', 'error'); return; }
     if (newPassword.length < 6) { addToast('New password must be at least 6 characters', 'error'); return; }
+    if (busy) return;
     setBusy(true);
     try {
       await api.changePassword(oldPassword, newPassword);
@@ -801,7 +960,7 @@ function Profile({ user, onUpdate }) {
           </div>
           <Input label="Display Name" value={displayName} onChange={e => setDisplayName(e.target.value)} />
           <Input label="Email (cannot change)" value={user.email} disabled style={{ opacity: 0.6 }} />
-          <Button onClick={saveProfile} disabled={busy} style={{ justifyContent: 'center' }}>Save Profile</Button>
+          <Button onClick={saveProfile} disabled={busy} style={{ justifyContent: 'center' }}>{busy ? 'Saving...' : 'Save Profile'}</Button>
         </div>
       </Card>
       <Card style={{ maxWidth: 500 }}>
@@ -809,7 +968,7 @@ function Profile({ user, onUpdate }) {
         <div className="grid">
           <Input label="Current Password" type="password" value={oldPassword} onChange={e => setOldPassword(e.target.value)} placeholder="Current password" />
           <Input label="New Password" type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} placeholder="At least 6 characters" />
-          <Button onClick={changePassword} disabled={busy} style={{ justifyContent: 'center' }}>Change Password</Button>
+          <Button onClick={changePassword} disabled={busy} style={{ justifyContent: 'center' }}>{busy ? 'Changing...' : 'Change Password'}</Button>
         </div>
       </Card>
     </div>
@@ -819,10 +978,13 @@ function Profile({ user, onUpdate }) {
 function Settings({ workspace, role, onUpdate }) {
   const editable = canManageTeam(role);
   const [name, setName] = useState(workspace.name);
+  const [busy, setBusy] = useState(false);
   
   const saveName = async () => {
-    if (!name.trim() || name === workspace.name) return;
+    if (!name.trim() || name === workspace.name || busy) return;
+    setBusy(true);
     await onUpdate({ name: name.trim() });
+    setBusy(false);
   };
   
   return (
@@ -833,7 +995,7 @@ function Settings({ workspace, role, onUpdate }) {
           <h3 style={{ marginBottom: 14 }}>Workspace</h3>
           <div className="grid">
             <Input label="Workspace Name" value={name} onChange={e => setName(e.target.value)} />
-            <Button onClick={saveName} style={{ justifyContent: 'center' }}>Save Name</Button>
+            <Button onClick={saveName} disabled={busy} style={{ justifyContent: 'center' }}>{busy ? 'Saving...' : 'Save Name'}</Button>
           </div>
         </Card>
       )}
@@ -854,10 +1016,25 @@ function Settings({ workspace, role, onUpdate }) {
 }
 
 function Root() {
-  return <ToastProvider><MainApp /></ToastProvider>;
+  return (
+    <ToastProvider>
+      <ConfirmProvider>
+        <MainApp />
+      </ConfirmProvider>
+    </ToastProvider>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(<Root />);
+
+/* REGISTER SERVICE WORKER */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/calibrate-pro/sw.js', { scope: '/calibrate-pro/' })
+      .then(() => console.log('SW registered'))
+      .catch((err) => console.warn('SW failed:', err));
+  });
+}
 </script>
 </body>
 </html>
